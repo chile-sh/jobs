@@ -72,11 +72,9 @@ export const run = async () => {
   await navQueue.empty()
   await rangeQueue.empty()
 
-  console.log('cleared queues')
+  logger.info('cleared queues')
 
   rangeQueue.process(async function (range) {
-    console.log('range\n', range.data, '\n/range')
-
     for (const num of range.data) {
       navQueue.add({ num, offset: 0, remote: true }, JOB_Q_CONFIG)
       jobsAdded.nav++
@@ -105,13 +103,13 @@ export const run = async () => {
   jobQueue.process(JOBS_THREADS, async function (job) {
     const data: { path: string; salaryRange: number[] } = job.data
     const info = await getJobInfo(data.path)
-    console.log(info.url)
+    logger.info(info.url, 'job queue url')
   })
 
   jobQueue.on('completed', async function () {
     jobsCompleted.info++
 
-    console.log('jobs', jobsCompleted.info, jobsAdded.info)
+    logger.info({ jobsCompleted, jobsAdded }, 'progress job queue [completed]')
 
     if (jobsCompleted.info === jobsAdded.info) {
       logger.info('All jobQueue jobs have been processed.')
@@ -127,7 +125,7 @@ export const run = async () => {
   navQueue.on('completed', async () => {
     jobsCompleted.nav++
 
-    console.log('nav', jobsCompleted.nav, jobsAdded.nav)
+    logger.info({ jobsCompleted, jobsAdded }, 'nav queue [completed]')
 
     if (!setTTL.nav) {
       await redis.expire('jobs:salaryRange', CACHE_TTL)

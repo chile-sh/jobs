@@ -1,5 +1,5 @@
 {
   "extends": "@jobs/tsconfig/api.json",
-  "include": ["src/**/*.ts"],
+  "include": ["**/*.ts"],
   "exclude": ["node_modules"]
 }
