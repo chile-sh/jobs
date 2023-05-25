@@ -1,0 +1,19 @@
+{
+  "name": "@jobs/ui",
+  "version": "0.0.0",
+  "main": "./index.tsx",
+  "types": "./index.tsx",
+  "license": "MIT",
+  "files": [
+    "styles.css"
+  ],
+  "scripts": {
+    "lint": "eslint \"**/*.ts*\"",
+    "lint:fix": "npm run lint -- --fix"
+  },
+  "devDependencies": {
+    "@jobs/configs": "*",
+    "@jobs/eslint-config-next": "*",
+    "@jobs/tsconfig": "*"
+  }
+}

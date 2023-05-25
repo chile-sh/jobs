@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: jobs_db
+    restart: always
+    networks:
+      - jobs_backend
+    env_file:
+      - stack.env
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgresdata:/var/lib/postgresql/data
+  cache:
+    image: redis:7-alpine
+    restart: always
+    container_name: jobs_cache
+    networks:
+      - jobs_backend
+    env_file:
+      - stack.env
+    ports:
+      - '6379:6379'
+    command: redis-server --save 20 1 --loglevel warning
+    volumes: 
+      - redisdata:/data
+
+networks:
+  jobs_backend:
+    name: jobs_backend
+
+volumes:
+  postgresdata:
+    name: jobs_db
+    driver: local
+  redisdata:
+    name: jobs_cache
+    driver: local

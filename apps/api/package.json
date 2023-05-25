@@ -1,0 +1,32 @@
+{
+  "name": "@jobs/api",
+  "version": "1.0.0",
+  "description": "Main TRPC API used by the frontend",
+  "private": true,
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 0",
+    "dev": "tsx watch -r dotenv/config src/index.ts",
+    "build": "tsc && tsc-alias",
+    "build:swc": "swc src -d dist --source-maps --copy-files",
+    "lint": "eslint \"**/*.ts*\"",
+    "lint:fix": "npm run lint -- --fix",
+    "db:migrate": "tsx -r dotenv/config db/migrate.ts"
+  },
+  "dependencies": {
+    "@jobs/api-util": "*",
+    "ajv": "^8.12.0",
+    "bull": "^4.10.4",
+    "envalid": "^7.3.1"
+  },
+  "devDependencies": {
+    "@jobs/configs": "*",
+    "@jobs/eslint-config-node": "*",
+    "@jobs/tsconfig": "*",
+    "@swc/cli": "^0.1.62",
+    "@swc/core": "^1.3.57"
+  },
+  "volta": {
+    "node": "20.1.0"
+  }
+}

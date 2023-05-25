@@ -1,0 +1,20 @@
+# Top-most EditorConfig file
+root = true
+
+# Unix-style newlines with a newline at the end
+[*]
+end_of_line = lf
+insert_final_newline = true
+
+# Use 2 spaces for indentation
+[*.ts]
+indent_style = space
+indent_size = 2
+
+[*.json]
+indent_style = space
+indent_size = 2
+
+# Ignore whitespace rules for Markdown files
+[*.md]
+trim_trailing_whitespace = false
