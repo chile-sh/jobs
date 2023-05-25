@@ -2,13 +2,14 @@ import { getEnvVariable } from '@jobs/api-util/env'
 import { fastifyTRPCPlugin } from '@trpc/server/adapters/fastify'
 import Fastify from 'fastify'
 import cors from '@fastify/cors'
+import ws from '@fastify/websocket'
 
 export const createFastify = async (
   serverName: string,
   // TODO: use proper types
   router: any, // eslint-disable-line @typescript-eslint/no-explicit-any
   createContext: any, // eslint-disable-line @typescript-eslint/no-explicit-any
-  opts: { logger: boolean } = { logger: true }
+  opts: { logger: boolean; useWSS: boolean } = { logger: true, useWSS: false }
 ) => {
   const fastify = Fastify({
     maxParamLength: 5000,
@@ -18,9 +19,14 @@ export const createFastify = async (
   fastify.register(fastifyTRPCPlugin, {
     prefix: '/trpc',
     trpcOptions: { router, createContext },
+    useWSS: opts.useWSS,
   })
 
   fastify.register(cors, {})
+
+  if (opts.useWSS) {
+    fastify.register(ws)
+  }
 
   try {
     const port = parseInt(getEnvVariable('PORT'))
