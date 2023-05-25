@@ -1,6 +1,6 @@
 import Queue from 'bull'
 import parse from 'parse-duration'
-import { createTRPCProxyClient, httpBatchLink } from '@trpc/client'
+import { createTRPCProxyClient, httpLink } from '@trpc/client'
 import { getEnvVariable } from '@jobs/api-util/env'
 import { host as redisHost, redis } from '@jobs/api-util/redis'
 import type { AppRouter } from '@jobs/scraper/src/router'
@@ -18,7 +18,7 @@ const rangeQueue = new Queue('salary range', bullDefaultConfig)
 
 const client = createTRPCProxyClient<AppRouter>({
   links: [
-    httpBatchLink({
+    httpLink({
       url: getEnvVariable('SCRAPER_URL'),
     }),
   ],
@@ -43,7 +43,7 @@ const getJobsFromSalaryRange = async (
 export const getJobInfo = async (path: string): Promise<ReturnType<typeof client.getJob.query>> => {
   const cached = await redis.hget('jobs:info-cache', path)
   if (cached) return JSON.parse(cached)
-
+  console.log({ path })
   const jobInfo = await client.getJob.query(path)
 
   redis.hset('jobs:info-cache', path, JSON.stringify(jobInfo))
@@ -109,7 +109,7 @@ export const run = async () => {
   jobQueue.on('completed', async function () {
     jobsCompleted.info++
 
-    logger.info({ jobsCompleted, jobsAdded }, 'progress job queue [completed]')
+    logger.info(jobsCompleted, 'progress job queue [completed]')
 
     if (jobsCompleted.info === jobsAdded.info) {
       logger.info('All jobQueue jobs have been processed.')
@@ -125,7 +125,7 @@ export const run = async () => {
   navQueue.on('completed', async () => {
     jobsCompleted.nav++
 
-    logger.info({ jobsCompleted, jobsAdded }, 'nav queue [completed]')
+    logger.info(jobsCompleted, 'nav queue [completed]')
 
     if (!setTTL.nav) {
       await redis.expire('jobs:salaryRange', CACHE_TTL)
