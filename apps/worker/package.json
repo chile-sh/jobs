@@ -10,13 +10,15 @@
   "devDependencies": {
     "@jobs/configs": "*",
     "@jobs/eslint-config-node": "*",
-    "@jobs/tsconfig": "*"
+    "@jobs/tsconfig": "*",
+    "@types/cron": "^2.0.1"
   },
   "dependencies": {
     "@jobs/api-util": "*",
     "@jobs/scraper": "*",
     "@trpc/client": "^10.27.1",
     "@trpc/server": "^10.27.1",
+    "cron": "^2.3.1",
     "parse-duration": "^1.0.3"
   }
 }
