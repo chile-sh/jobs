@@ -1,0 +1,41 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
+// https://github.com/microsoft/vscode-dev-containers/tree/main/containers/typescript-node
+{
+    "name": "Jobs dev environment",
+    "runArgs": [
+        "--name",
+        "${localEnv:USER}_jobs_devcontainer",
+        "--network=jobs_backend",
+        "-p=3000-3100:3000-3100"
+    ],
+    "build": {
+        "dockerfile": "Dockerfile",
+        "args": {
+            "VARIANT": "20-bullseye"
+        }
+    },
+    "containerEnv": {
+        "HOST": "0.0.0.0"
+    },
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "dbaeumer.vscode-eslint",
+                "EditorConfig.EditorConfig",
+                "aaron-bond.better-comments",
+                "eamodio.gitlens",
+                "Gruntfuggly.todo-tree",
+                "PKief.material-icon-theme",
+                "GitHub.github-vscode-theme",
+                "ms-azuretools.vscode-docker",
+                "yoavbls.pretty-ts-errors"
+            ]
+        }
+    },
+    "remoteUser": "node",
+    "features": {
+        "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {},
+        "ghcr.io/devcontainers/features/git:1": {},
+        "ghcr.io/devcontainers/features/sshd:1": {}
+	}
+}
