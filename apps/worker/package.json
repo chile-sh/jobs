@@ -18,8 +18,5 @@
     "@trpc/client": "^10.27.1",
     "@trpc/server": "^10.27.1",
     "parse-duration": "^1.0.3"
-  },
-  "volta": {
-    "node": "20.1.0"
   }
 }
