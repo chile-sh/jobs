@@ -48,3 +48,20 @@ turbo run dev
 # or with filters
 turbo run dev --filter=@jobs/worker --filter=@jobs/scraper
 ```
+
+To install a dependency on a repo:
+
+```bash
+# Example
+npm i fastify -w @jobs/api
+```
+
+### Optional
+
+Install [Commitizen](https://github.com/commitizen/cz-cli) for [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/).
+
+```bash
+pip install --user -U Commitizen
+
+cz commit
+```
