@@ -3,8 +3,8 @@
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev",
-    "lint": "turbo run lint",
-    "lint:fix": "turbo run lint:fix",
+    "lint": "turbo run lint --",
+    "lint:fix": "turbo run lint:fix --",
     "test": "turbo run test",
     "clean": "turbo run clean && find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
