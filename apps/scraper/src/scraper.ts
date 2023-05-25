@@ -30,7 +30,8 @@ export const createGOB = (session: string, token: string) => {
   }
 
   const getJob = async (slug: string): Promise<JobData> => {
-    const res = await fetch(`https://www.getonbrd.com/jobs/${slug}`)
+    const cleanSlug = slug.replace(/\/?jobs\/?/, '')
+    const res = await fetch(`https://www.getonbrd.com/jobs/${cleanSlug}`)
     const html = await res.text()
     const $ = load(html)
 
