@@ -1,0 +1,17 @@
+{
+  "name": "@jobs/helpers",
+  "version": "0.0.0",
+  "private": true,
+  "main": "index.ts",
+  "scripts": {
+    "lint": "eslint \"**/*.ts*\"",
+    "lint:fix": "npm run lint -- --fix"
+  },
+  "devDependencies": {
+    "@jobs/eslint-config-node": "*",
+    "@jobs/tsconfig": "*"
+  },
+  "dependencies": {
+    "parse-duration": "^1.0.3"
+  }
+}
