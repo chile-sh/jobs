@@ -1,3 +1,5 @@
+import { InsertableJob } from '@jobs/db/tables'
+import type { SetOptional } from 'type-fest'
 export interface Job {
   id: number
   url: string
@@ -47,33 +49,35 @@ export interface JobSearchMeta {
   }
 }
 
-export interface JobData {
-  url: string
-  title: string
-  level: string
-  type: string
-  area: string
-  date: string
-  description: string
-  applications?: [string, number, number?]
-  repliesIn?: [string, number, number?]
-  lastChecked?: [string, number]
-  requiresApplyingIn?: string
-  location: {
-    modality?: string
-    place?: string
-  }
-  company: {
-    slug: string
-    name: string
-    logo: string
-  }
-  tags?: string[]
-  salary?: {
-    type: string
-    min: number
-    max: number
-    unit: string
-    currency: string
-  }
-}
+// export interface JobData {
+//   url: string
+//   title: string
+//   level: string
+//   type: string
+//   area: string
+//   date: string
+//   description: string
+//   applications?: [string, number, number?]
+//   repliesIn?: [string, number, number?]
+//   lastChecked?: [string, number]
+//   requiresApplyingIn?: string
+//   location: {
+//     modality?: string
+//     place?: string
+//   }
+//   company: {
+//     slug: string
+//     name: string
+//     logo: string
+//   }
+//   tags?: string[]
+//   salary?: {
+//     type: string
+//     min: number
+//     max: number
+//     unit: string
+//     currency: string
+//   }
+// }
+
+type JobData = SetOptional<InsertableJob, 'company_id' | 'country_id'>
