@@ -15,6 +15,11 @@ Packages:
 - `@jobs/eslint-config-node`
 - `@jobs/tsconfig`
 
+## Setup
+
+In your local environment, make sure the `DEVCONTAINER_CPUS` is set to a number of cpu's below the number of total
+that you have on your machine (e.g 8 cores -> 6 cores for the container)
+
 ### Run docker compose
 
 Create a `stack.env` file:

@@ -6,7 +6,8 @@
         "--name",
         "${localEnv:USER}_jobs_devcontainer",
         "--network=jobs_backend",
-        "-p=3000-3100:3000-3100"
+        "-p=3000-3100:3000-3100",
+        "--cpus=${localEnv:DEVCONTAINER_CPUS}"
     ],
     "build": {
         "dockerfile": "Dockerfile",
