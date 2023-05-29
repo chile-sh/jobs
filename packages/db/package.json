@@ -1,0 +1,19 @@
+{
+  "name": "@jobs/db",
+  "version": "0.0.0",
+  "private": true,
+  "main": "index.ts",
+  "scripts": {
+    "lint": "eslint \"**/*.ts*\"",
+    "lint:fix": "npm run lint -- --fix"
+  },
+  "devDependencies": {
+    "@jobs/configs": "*",
+    "@jobs/eslint-config-node": "*",
+    "@types/pg": "^8.10.1"
+  },
+  "dependencies": {
+    "kysely": "^0.24.2",
+    "pg": "^8.11.0"
+  }
+}
