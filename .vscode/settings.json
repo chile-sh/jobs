@@ -6,5 +6,16 @@
     ],
     "editor.codeActionsOnSave": {
         "source.fixAll": true
-    }
+    },
+    "conventionalCommits.scopes": [
+      "api-util",
+      "api",
+      "configs",
+      "db",
+      "helpers",
+      "scraper",
+      "ui",
+      "web",
+      "worker"
+    ]
 }

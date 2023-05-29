@@ -29,7 +29,8 @@
                 "PKief.material-icon-theme",
                 "GitHub.github-vscode-theme",
                 "ms-azuretools.vscode-docker",
-                "yoavbls.pretty-ts-errors"
+                "yoavbls.pretty-ts-errors",
+                "vivaxy.vscode-conventional-commits"
             ]
         }
     },
