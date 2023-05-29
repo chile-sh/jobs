@@ -61,6 +61,13 @@ To install a dependency on a repo:
 npm i fastify -w @jobs/api
 ```
 
+### Run migrations
+
+```bash
+# options are --dir=up|down|latest
+npm run db:migrate -w @jobs/api -- --dir=up
+```
+
 ### Optional
 
 Install [Commitizen](https://github.com/commitizen/cz-cli) for [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/).
@@ -69,4 +76,7 @@ Install [Commitizen](https://github.com/commitizen/cz-cli) for [conventional com
 pip install --user -U Commitizen
 
 cz commit
+cz bump
 ```
+
+The devcontainer already comes with Commitizen and the [Conventional Commits extension](https://github.com/vivaxy/vscode-conventional-commits) for VSCode.
