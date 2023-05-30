@@ -1,5 +1,7 @@
 import { ValidatorSpec, cleanEnv, port, str } from 'envalid'
 
+export { cleanEnv, port, str }
+
 export * as envalid from 'envalid'
 
 export const validateEnv = <T>(
@@ -10,10 +12,5 @@ export const validateEnv = <T>(
 ) =>
   cleanEnv(env, {
     NODE_ENV: str({ choices: ['development', 'test', 'production', 'staging'] }),
-    PORT: port(),
     ...vars,
   })
-
-export const env = validateEnv({
-  REDIS_HOST: str(),
-})

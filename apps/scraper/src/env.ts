@@ -1,3 +1,7 @@
-import { validateEnv, envalid } from '@jobs/api-util/env'
+import { validateEnv, str, port } from '@jobs/helpers/env'
 
-export const env = validateEnv({ GOB_SESSION: envalid.str(), GOB_CSRF_TOKEN: envalid.str() })
+export const env = validateEnv({
+  PORT: port(),
+  GOB_SESSION: str(),
+  GOB_CSRF_TOKEN: str(),
+})

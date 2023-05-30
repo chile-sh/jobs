@@ -1,8 +1,8 @@
-import { validateEnv, envalid } from '@jobs/api-util/env'
+import { cleanEnv, str } from '@jobs/helpers/env'
 
-export const env = validateEnv({
-  POSTGRES_HOST: envalid.str(),
-  POSTGRES_USER: envalid.str(),
-  POSTGRES_PASSWORD: envalid.str(),
-  POSTGRES_DB: envalid.str({ default: 'jobs' }),
+export const env = cleanEnv(process.env, {
+  POSTGRES_HOST: str(),
+  POSTGRES_USER: str(),
+  POSTGRES_PASSWORD: str(),
+  POSTGRES_DB: str({ default: 'jobs' }),
 })
