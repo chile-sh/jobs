@@ -1,7 +1,7 @@
 import { Pool } from 'pg'
 import { validateEnv, envalid, getEnvVariable } from '@jobs/api-util/env'
 import { Kysely, PostgresDialect, RawBuilder, sql } from 'kysely'
-import { CompanyTable, CountryTable, JobTable } from './tables'
+import { CompanyTable, CountryTable, JobTable, TagTable } from './tables'
 
 validateEnv({
   POSTGRES_HOST: envalid.str(),
@@ -17,6 +17,7 @@ interface Database {
   country: CountryTable
   job: JobTable
   company: CompanyTable
+  tag: TagTable
 }
 
 export function toJson<T>(obj: T): RawBuilder<T> {
