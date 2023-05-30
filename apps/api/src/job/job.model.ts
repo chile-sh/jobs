@@ -1,19 +1,31 @@
 import { createCompany, findCompanyByName } from '@/company/company.model'
 import { createCountry, findCountryByName } from '@/country/country.model'
-import type { InsertableCompany, InsertableCountry } from '@jobs/db/tables'
+import { createCity, findCityByName } from '@/city/city.model'
+import type { InsertableCompany, InsertableCountry, InsertableCity } from '@jobs/db/tables'
 import { db } from '@jobs/db'
 
 import { InsertableJob } from '@jobs/db/tables'
 import type { SetOptional } from 'type-fest'
 
-type InsertJobData = SetOptional<InsertableJob, 'company_id' | 'country_id'>
+type InsertJobData = SetOptional<InsertableJob, 'company_id' | 'city_id'>
 
-export const createJob = async (jobData: InsertJobData, company: InsertableCompany, country: InsertableCountry) => {
+export const createJob = async (
+  jobData: InsertJobData,
+  { company, country, city }: { company: InsertableCompany; country?: string | null; city?: string | null }
+) => {
+  let countryId: number | undefined
+  let cityId: number | undefined
+
+  if (country && city) {
+    const foundCountry = await findCountryByName(country)
+    const foundCity = foundCountry ? await findCityByName(city, foundCountry.id) : undefined
+
+    countryId = foundCountry?.id ?? (await createCountry({ name: country })).id
+    cityId = foundCity?.id ?? (await createCity(city, countryId)).id
+  }
+
   const foundCompany = await findCompanyByName(company.name)
-  const foundCountry = await findCountryByName(country.name)
-
   const companyId = foundCompany?.id ?? (await createCompany(company)).id
-  const countryId = foundCountry?.id ?? (await createCountry(country)).id
 
   // Create the job
   return db
@@ -21,7 +33,7 @@ export const createJob = async (jobData: InsertJobData, company: InsertableCompa
     .values({
       ...jobData,
       company_id: companyId,
-      country_id: countryId,
+      city_id: cityId,
     })
     .returningAll()
     .executeTakeFirstOrThrow()
