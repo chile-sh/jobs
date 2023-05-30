@@ -1,8 +1,8 @@
-import { Country, InsertableCountry } from '@jobs/db/tables'
+import { InsertableTag, Tag } from '@jobs/db/tables'
 import { db } from '@jobs/db'
 
-export const findCountryByName = async (name: string): Promise<Country | undefined> =>
-  db.selectFrom('country').selectAll().where('name', '=', name).executeTakeFirst()
+export const findTag = async (tag: string): Promise<Tag | undefined> =>
+  db.selectFrom('tag').selectAll().where('tag', '=', tag).executeTakeFirst()
 
-export const createCountry = async (country: InsertableCountry) =>
-  db.insertInto('country').values(country).returning('id').executeTakeFirstOrThrow()
+export const createTag = async (tag: InsertableTag) =>
+  db.insertInto('tag').values(tag).returning('id').executeTakeFirstOrThrow()
