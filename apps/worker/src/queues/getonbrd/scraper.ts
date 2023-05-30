@@ -8,10 +8,13 @@ import { logger } from '@jobs/api-util/logger'
 import { Job } from '@jobs/scraper/src/types'
 import { insertQueue } from './insert-db'
 import { bullDefaultConfig } from '../../bull-config'
+import { AsyncReturnType } from 'type-fest'
+import { env } from '../../env'
 
 const SALARY_STEP = 50
 const JOBS_THREADS = 5
-const CACHE_TTL = parseDuration('4 hours', 'sec')
+
+const CACHE_TTL = parseDuration(env.isProd ? '2 hours' : '1 week', 'sec')
 
 export const navQueue = new Queue('fetch salaries', bullDefaultConfig)
 export const jobQueue = new Queue('fetch jobs', bullDefaultConfig)
@@ -20,7 +23,7 @@ export const rangeQueue = new Queue('salary range', bullDefaultConfig)
 const client = createTRPCProxyClient<AppRouter>({
   links: [
     httpLink({
-      url: getEnvVariable('SCRAPER_URL'),
+      url: getEnvVariable('JOBS_SCRAPER_URL'),
     }),
   ],
 })
@@ -44,7 +47,6 @@ const getJobsFromSalaryRange = async (
 export const getJobInfo = async (path: string): Promise<ReturnType<typeof client.getJob.query>> => {
   const cached = await redis.hget('jobs:info-cache', path)
   if (cached) return JSON.parse(cached)
-  console.log({ path })
   const jobInfo = await client.getJob.query(path)
 
   redis.hset('jobs:info-cache', path, JSON.stringify(jobInfo))
@@ -62,6 +64,12 @@ const makeRange = (from = 50, to = 20000, step = SALARY_STEP) => {
 }
 
 const JOB_QUEUE_CONFIG: Queue.JobOptions = { removeOnComplete: true, attempts: 5 }
+
+export interface JobFullPayload {
+  source: string
+  info: AsyncReturnType<typeof getJobInfo>
+  meta: Job
+}
 
 export const runScraper = async () => {
   logger.info('running queue "get-jobs"')
@@ -105,7 +113,7 @@ export const runScraper = async () => {
     const data: { path: string; salaryRange: number[]; jobMeta: Job } = job.data
 
     const info = await getJobInfo(data.path)
-    const jobInfo = { source: 'getonbrd', info, meta: data.jobMeta }
+    const jobInfo: JobFullPayload = { source: 'getonbrd', info, meta: data.jobMeta }
 
     logger.info(info.url, 'job queue url')
     insertQueue.add(jobInfo, { removeOnComplete: true })
