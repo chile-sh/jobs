@@ -4,7 +4,6 @@ import { createTRPCProxyClient, httpLink } from '@trpc/client'
 import { redis } from '@jobs/api-util/redis'
 import type { AppRouter } from '@jobs/scraper/src/router'
 import { logger } from '@jobs/api-util/logger'
-import { Job } from '@jobs/scraper/src/types'
 import { insertQueue, jobQueue, navQueue, rangeQueue } from './queues'
 import { AsyncReturnType } from 'type-fest'
 import { env } from '../../env'
@@ -31,12 +30,12 @@ const getJobsFromSalaryRange = async (
   remote = false
 ): Promise<ReturnType<typeof client.filter.query>> => {
   const cacheKey = [from, to, offset, remote].join()
-  const cached = await redis.hget('jobs:cache', cacheKey)
+  const cached = await redis.hget('jobs:nav-cache', cacheKey)
   if (cached) return JSON.parse(cached)
 
   const jobsList = await client.filter.query({ salary: [from, to], offset, remote })
 
-  redis.hset('jobs:cache', cacheKey, JSON.stringify(jobsList))
+  redis.hset('jobs:nav-cache', cacheKey, JSON.stringify(jobsList))
   return jobsList
 }
 
@@ -64,7 +63,6 @@ const JOB_QUEUE_CONFIG: Queue.JobOptions = { removeOnComplete: true, attempts: 5
 export interface JobFullPayload {
   source: string
   info: AsyncReturnType<typeof getJobInfo>
-  meta: Job
 }
 
 export const runScraper = async () => {
@@ -90,6 +88,8 @@ export const runScraper = async () => {
     const res = await getJobsFromSalaryRange(min, data.num, data.offset, data.remote)
 
     for (const job of res.jobs) {
+      await redis.hset('jobs:meta-cache', job.url, JSON.stringify(job))
+
       const currVal = await redis.hget('jobs:salaryRange', job.url)
       const arr = currVal ? [...JSON.parse(currVal), data.num] : [data.num]
       await redis.hset('jobs:salaryRange', job.url, JSON.stringify(arr))
@@ -102,10 +102,10 @@ export const runScraper = async () => {
   })
 
   jobQueue.process(JOBS_THREADS, async function (job) {
-    const data: { path: string; salaryRange: number[]; jobMeta: Job } = job.data
+    const data: { path: string; salaryRange: number[] } = job.data
 
     const info = await getJobInfo(data.path)
-    const jobInfo: JobFullPayload = { source: 'getonbrd', info, meta: data.jobMeta }
+    const jobInfo: JobFullPayload = { source: 'getonbrd', info }
 
     logger.info(info.url, 'job queue url')
     insertQueue.add(jobInfo, { removeOnComplete: true })
@@ -121,7 +121,8 @@ export const runScraper = async () => {
     }
 
     if (!setTTL.info) {
-      await redis.expire('jobs:cache', CACHE_TTL)
+      await redis.expire('jobs:nav-cache', CACHE_TTL)
+      await redis.expire('jobs:meta-cache', CACHE_TTL)
       await redis.expire('jobs:info-cache', CACHE_TTL)
       setTTL.info = true
     }
