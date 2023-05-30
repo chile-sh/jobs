@@ -68,7 +68,14 @@ npm i fastify -w @jobs/api
 npm run db:migrate -w @jobs/api -- --dir=up
 ```
 
-### Optional
+### Development
+
+Set your git email and username:
+
+```bash
+git config --global user.email "admin@example.com"
+git config --global user.name "admin"
+```
 
 Install [Commitizen](https://github.com/commitizen/cz-cli) for [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/).
 
@@ -80,3 +87,4 @@ cz bump
 ```
 
 The devcontainer already comes with Commitizen and the [Conventional Commits extension](https://github.com/vivaxy/vscode-conventional-commits) for VSCode.
+
