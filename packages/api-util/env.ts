@@ -2,13 +2,12 @@ import { cleanEnv, port, str } from 'envalid'
 
 export * as envalid from 'envalid'
 
-export const validateEnv = (vars = {}, env = process.env) => {
+export const validateEnv = (vars = {}, env = process.env) =>
   cleanEnv(env, {
-    NODE_ENV: str(),
+    NODE_ENV: str({ choices: ['development', 'test', 'production', 'staging'] }),
     PORT: port(),
     ...vars,
   })
-}
 
 export function getEnvVariable(name: string): string {
   const value = process.env[name]
