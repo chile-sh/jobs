@@ -126,28 +126,8 @@ export const createGOB = (session: string, token: string) => {
     return job
   }
 
-  const search = async (term: string) => {
-    const res = await fetch(`https://www.getonbrd.com/jobs-${term.replace(/\s+/, '-')}`)
-    const html = await res.text()
-    const $ = load(html)
-    const results = $('.gb-results-list > div')
-      .map((_, el) => {
-        const url = $(el).find('a').attr('href')
-        const info = {
-          url,
-          slug: url?.match(/jobs\/(.+)/)?.[1],
-        }
-
-        return info
-      })
-      .get()
-
-    return results
-  }
-
   return {
     navJobs,
     getJob,
-    search,
   }
 }

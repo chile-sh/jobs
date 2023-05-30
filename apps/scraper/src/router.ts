@@ -21,7 +21,6 @@ export const appRouter = router({
   getJob: publicProcedure
     .input(z.string({ description: 'Job slug', required_error: 'slug is required' }))
     .query(async opts => gob.getJob(opts.input)),
-  search: publicProcedure.input(z.string({ description: 'Search term' })).query(async opts => gob.search(opts.input)),
 })
 
 export type AppRouter = typeof appRouter
