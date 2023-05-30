@@ -14,15 +14,15 @@ RUN su node -c "npm install -g turbo next tsx"
 RUN su node -c "curl -L https://git.io/antigen > ~/.antigen.zsh"
 
 RUN echo '\n\
-source ~/.antigen.zsh \n\
-antigen use oh-my-zsh \n\
-antigen bundle git \n\
-antigen bundle bash \n\
-antigen bundle command-not-found \n\
-antigen bundle zsh-users/zsh-syntax-highlighting \n\
-antigen bundle zsh-users/zsh-autosuggestions \n\
-antigen theme spaceship-prompt/spaceship-prompt \n\
-antigen apply' > /home/node/.zshrc
+    source ~/.antigen.zsh \n\
+    antigen use oh-my-zsh \n\
+    antigen bundle git \n\
+    antigen bundle bash \n\
+    antigen bundle command-not-found \n\
+    antigen bundle zsh-users/zsh-syntax-highlighting \n\
+    antigen bundle zsh-users/zsh-autosuggestions \n\
+    antigen theme spaceship-prompt/spaceship-prompt \n\
+    antigen apply' > /home/node/.zshrc
 
 RUN chown node /home/node/.zshrc
 RUN chsh -s $(which zsh) node
