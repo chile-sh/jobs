@@ -1,72 +1,95 @@
 export interface Job {
-  id: number
-  title: string
-  url: string
+  allows_quick_apply: boolean
+  boards?: string[]
+  cities: string
+  collapse_locations: boolean
+  company: {
+    name: string
+    about: string
+    url: string
+  }
+  countries: string
   description_headline: string
-  recommended: boolean
-  pinned: boolean
-  is_hot: boolean
-  salary: string
-  user_id: number
+  display_as_annual: boolean
+  divider: string
+  github_required: boolean
+  has_relocation_perk: boolean
+  hidden: boolean
   hiring_company: string
   hiring_organization: string
+  hybrid: boolean
+  id: number
+  is_board_job: boolean
+  is_hot: boolean
+  linkedin_required: boolean
+  location_objects: {
+    flag_url: string
+    sentence: string
+    tenant_home: string
+  }[]
+  locations_to_sentence_short: string
+  locations_to_sentence: string
+  logo_url: string
+  max_salary?: number
+  min_salary?: number
+  new: boolean
+  no_remote: boolean
+  perks?: string[]
+  pinned: boolean
+  portfolio_required: boolean
+  published_at: string
+  recommended: boolean
+  remote_local: boolean
   remote_modality: string
   remote_zone: string
-  hidden: boolean
-  github_required: boolean
-  linkedin_required: boolean
-  portfolio_required: boolean
-  allows_quick_apply: boolean
-  salary_type: string
   remote: boolean
+  salary_type: string
+  salary: string
+  seniority: string
+  show_salary: boolean
   temporarily_remote: boolean
-  remote_local: boolean
-  hybrid: boolean
-  city: string
-  country: string
+  title: string
+  url: string
+  user_id: number
 }
 
 export interface JobSearchMeta {
-  jobs_offset: number
   jobs_count: number
-  reset_results: boolean
   jobs_limit: number
+  jobs_offset: number
   preferences: {
     category_ids: number[]
+    companies_blacklist_ids: number[]
+    following_company_ids: number[]
+    max_salary: number | null
+    min_salary: number | null
+    modality_ids: number[]
+    remote_jobs: boolean
+    seniority_ids: number[]
     tag_ids: number[]
     tenant_ids: number[]
-    modality_ids: number[]
-    companies_blacklist_ids: number[]
-    seniority_ids: number[]
-    following_company_ids: number[]
-    min_salary: number | null
-    max_salary: number | null
-    remote_jobs: boolean
   }
+  reset_results: boolean
 }
 
 export interface JobData {
-  url: string
-  title: string
-  level: string
-  type: string
-  area: string
-  date: string
-  description: string
   applications?: number
-  repliesIn?: [string, number, number | undefined]
-  lastChecked?: [string, number]
-  requiresApplyingIn?: string
-  location: {
-    modality?: string
-    place?: string
-  }
+  area: string
   company: {
     slug: string
     name: string
     logo: string
   }
-  tags?: string[]
+  date: string
+  description: string
+  lastChecked?: [string, number]
+  level: string
+  location: {
+    modality?: string
+    place?: string
+  }
+  repliesIn?: [string, number, number | undefined]
+  requiresApplyingIn?: string
   salary?: {
     type: string
     min: number
@@ -74,4 +97,8 @@ export interface JobData {
     unit: string
     currency: string
   }
+  tags?: string[]
+  title: string
+  type: string
+  url: string
 }
