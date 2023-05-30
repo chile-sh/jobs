@@ -1,16 +1,13 @@
-import Queue from 'bull'
 import { logger } from '@jobs/api-util/logger'
-import { bullDefaultConfig } from '../../bull-config'
 import { parseDuration, waitFor } from '@jobs/helpers'
 import type { AppRouter } from '@jobs/api/src/router'
 import { createTRPCProxyClient, httpLink } from '@trpc/client'
 import { getEnvVariable } from '@jobs/api-util/env'
 import { JobFullPayload } from './scraper'
+import { insertQueue } from './queues'
 
 const JOBS_THREADS = 2
 const QUEUE_END_TIMEOUT = parseDuration('1s')
-
-export const insertQueue = new Queue('insert jobs', bullDefaultConfig)
 
 const apiClient = createTRPCProxyClient<AppRouter>({
   links: [
@@ -28,8 +25,6 @@ export const runInsertDb = async () => {
   logger.info('running queue "insert-jobs"')
   const jobsInserted = { doing: 0, done: 0 }
   let checkIfFinishedTimeout: ReturnType<typeof setTimeout>
-
-  await insertQueue.empty()
 
   logger.info('cleared queues')
 
@@ -81,7 +76,7 @@ export const runInsertDb = async () => {
 
   insertQueue.on('completed', async function () {
     jobsInserted.done++
-    logger.info(jobsInserted, 'progress job queue [completed]')
+    logger.info(jobsInserted, 'progress insert job queue [completed]')
 
     clearTimeout(checkIfFinishedTimeout)
     checkIfFinishedTimeout = setTimeout(onQueueEnd, QUEUE_END_TIMEOUT)

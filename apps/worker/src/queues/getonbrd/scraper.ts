@@ -6,8 +6,7 @@ import { redis } from '@jobs/api-util/redis'
 import type { AppRouter } from '@jobs/scraper/src/router'
 import { logger } from '@jobs/api-util/logger'
 import { Job } from '@jobs/scraper/src/types'
-import { insertQueue } from './insert-db'
-import { bullDefaultConfig } from '../../bull-config'
+import { insertQueue, jobQueue, navQueue, rangeQueue } from './queues'
 import { AsyncReturnType } from 'type-fest'
 import { env } from '../../env'
 
@@ -15,10 +14,6 @@ const SALARY_STEP = 50
 const JOBS_THREADS = 5
 
 const CACHE_TTL = parseDuration(env.isProd ? '2 hours' : '1 week', 'sec')
-
-export const navQueue = new Queue('fetch salaries', bullDefaultConfig)
-export const jobQueue = new Queue('fetch jobs', bullDefaultConfig)
-export const rangeQueue = new Queue('salary range', bullDefaultConfig)
 
 const client = createTRPCProxyClient<AppRouter>({
   links: [
@@ -77,10 +72,6 @@ export const runScraper = async () => {
   const jobsAdded = { nav: 0, info: 0 }
   const setTTL = { nav: false, info: false }
 
-  await jobQueue.empty()
-  await navQueue.empty()
-  await rangeQueue.empty()
-
   logger.info('cleared queues')
 
   rangeQueue.process(async function (range) {
@@ -122,7 +113,7 @@ export const runScraper = async () => {
   jobQueue.on('completed', async function () {
     jobsCompleted.info++
 
-    logger.info(jobsCompleted, 'progress job queue [completed]')
+    logger.info(jobsCompleted, 'progress fetch job queue [completed]')
 
     if (jobsCompleted.info === jobsAdded.info) {
       logger.info('All jobQueue jobs have been processed.')
