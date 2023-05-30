@@ -9,7 +9,7 @@ export const appRouter = router({
   filter: publicProcedure
     .input(
       z.object({
-        salary: z.array(z.number().min(50).positive(), z.number().positive().max(20000)),
+        salary: z.array(z.number().min(0).positive(), z.number().positive().max(40000)),
         remote: z.boolean().default(false),
         offset: z.number().gte(0),
       })

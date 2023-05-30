@@ -48,9 +48,9 @@ export const createGOB = (session: string, token: string) => {
     const _company = $('[itemprop="hiringOrganization"]')
     const company = {
       slug: _company
-        ?.find('a')
-        ?.attr('href')
-        ?.match(/companies\/(.+)/)?.[1],
+        .find('a')
+        .attr('href')
+        ?.match(/companies\/(.+)/)?.[1] as string,
       name: txt(_company.find('[itemprop="name"]')),
       logo: txt(_company.find('[itemprop="logo"]')),
     }
@@ -65,13 +65,15 @@ export const createGOB = (session: string, token: string) => {
     const min = _salary.find('[itemprop="minValue"]').attr('content')
     const max = _salary.find('[itemprop="maxValue"]').attr('content')
 
-    const salary = {
-      type: _salary.find('.hide-on-small-mobile').text().match(/gross/i) ? 'gross' : 'net',
-      min: min ? +min : null,
-      max: max ? +max : null,
-      unit: _salary.find('[itemprop="unitText"]').attr('content'),
-      currency: _salary.find('[itemprop="currency"]').attr('content'),
-    }
+    const salary = !!(min && max)
+      ? {
+          type: _salary.find('.hide-on-small-mobile').text().match(/gross/i) ? 'gross' : 'net',
+          min: +min,
+          max: +max,
+          unit: _salary.find('[itemprop="unitText"]').attr('content') as string,
+          currency: _salary.find('[itemprop="currency"]').attr('content') as string,
+        }
+      : undefined
 
     const otherInfo = $('.size0')
       .first()
@@ -113,7 +115,7 @@ export const createGOB = (session: string, token: string) => {
       area: jobArea,
       level,
       type,
-      salary: salary.min && salary.max ? salary : null,
+      salary,
       description,
       location,
       tags,

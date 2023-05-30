@@ -11,7 +11,7 @@ export interface Job {
   hiring_company: string
   hiring_organization: string
   remote_modality: string
-  remote_zone: string | unknown
+  remote_zone: string
   hidden: boolean
   github_required: boolean
   linkedin_required: boolean
@@ -22,10 +22,8 @@ export interface Job {
   temporarily_remote: boolean
   remote_local: boolean
   hybrid: boolean
-  city: string | unknown
-  country: {
-    [key: string]: string
-  }
+  city: string
+  country: string
 }
 
 export interface JobSearchMeta {
@@ -55,8 +53,8 @@ export interface JobData {
   area: string
   date: string
   description: string
-  applications?: [string, number, number?]
-  repliesIn?: [string, number, number?]
+  applications?: number
+  repliesIn?: [string, number, number | undefined]
   lastChecked?: [string, number]
   requiresApplyingIn?: string
   location: {
@@ -64,16 +62,16 @@ export interface JobData {
     place?: string
   }
   company: {
-    slug: string | undefined
+    slug: string
     name: string
     logo: string
-  } | null
+  }
   tags?: string[]
   salary?: {
     type: string
-    min: number | null
-    max: number | null
-    unit: string | undefined
-    currency: string | undefined
-  } | null
+    min: number
+    max: number
+    unit: string
+    currency: string
+  }
 }
