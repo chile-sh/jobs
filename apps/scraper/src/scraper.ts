@@ -54,7 +54,7 @@ export const createGOB = (session: string, token: string) => {
       name: txt(_company.find('[itemprop="name"]')),
       logo: txt(_company.find('[itemprop="logo"]')),
     }
-    const date = txt(_company.find('time'))
+    const date = $(`[itemprop="datePosted"]`).attr('datetime') as string
     const url = $(`link[itemprop='url']`).attr('href') as string
     const locModality = _location.toLowerCase().match(/remote|hybrid/)?.[0]
     const location = {
