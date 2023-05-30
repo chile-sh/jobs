@@ -14,17 +14,11 @@ export const jobRouter = router({
           slug: z.string(),
           logo: z.string(),
         }),
-        country: z.object({
-          name: z.string(),
-          code: z.string(),
-        }),
+        countries: z.string().optional().nullable(),
         area: z.string(),
-        cities: z.string(),
+        cities: z.string().optional().nullable(),
         date: z.date(),
-        description: z.object({
-          text: z.string(),
-          headline: z.string(),
-        }),
+        description: z.string(),
         level: z.string(),
         tags: z.array(z.string()).optional(),
         type: z.string(),
@@ -42,13 +36,14 @@ export const jobRouter = router({
             hybrid: z.boolean(),
             local: z.boolean(),
             temporarily: z.boolean(),
-            modality: z.string(),
-            zone: z.string(),
+            modality: z.string().optional().nullable(),
+            zone: z.string().optional().nullable(),
           })
           .nullable(),
         meta: z.object({
           ext_id: z.number(),
           user_id: z.number(),
+          perks: z.array(z.string()),
           allows_quick_apply: z.boolean(),
           applications: z.number().optional(),
           hidden: z.boolean(),
@@ -59,7 +54,7 @@ export const jobRouter = router({
           github_required: z.boolean(),
           linkedin_required: z.boolean(),
           portfolio_required: z.boolean(),
-          replies_in: z.tuple([z.string(), z.number(), z.number().optional()]).optional(),
+          replies_in: z.tuple([z.string(), z.number()]).rest(z.number()).optional(),
           requires_applying_in: z.string().optional(),
         }),
       })
@@ -70,8 +65,7 @@ export const jobRouter = router({
         {
           url: input.url,
           area: input.area,
-          description: input.description.text,
-          description_headline: input.description.headline,
+          description: input.description,
           level: input.level,
           remote_hybrid: input.remote?.hybrid,
           remote_local: input.remote?.local,
@@ -80,8 +74,7 @@ export const jobRouter = router({
           remote_zone: input.remote?.zone,
           title: input.title,
           type: input.type,
-          cities: input.cities,
-          date: input.date.toISOString(),
+          date: input.date.toDateString(),
           salary_currency: input.salary?.currency,
           salary_max: input.salary?.max,
           salary_min: input.salary?.min,
@@ -89,8 +82,11 @@ export const jobRouter = router({
           salary_unit: input.salary?.unit,
           meta: toJson(input.meta),
         },
-        { name: input.company.name, logo: input.company.logo, slug: input.company.slug },
-        { name: input.country.name, code: input.country.code }
+        {
+          company: input.company,
+          country: input.countries,
+          city: input.cities,
+        }
       )
 
       return {
