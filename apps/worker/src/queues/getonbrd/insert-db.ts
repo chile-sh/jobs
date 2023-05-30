@@ -5,11 +5,13 @@ import { createTRPCProxyClient, httpLink } from '@trpc/client'
 import { JobFullPayload } from './scraper'
 import { insertQueue } from './queues'
 import { env } from '../../env'
+import superjson from 'superjson'
 
-const JOBS_THREADS = 2
+const JOBS_THREADS = 1
 const QUEUE_END_TIMEOUT = parseDuration('1s')
 
 const apiClient = createTRPCProxyClient<AppRouter>({
+  transformer: superjson,
   links: [
     httpLink({
       url: env.JOBS_API_URL,

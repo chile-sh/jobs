@@ -8,6 +8,7 @@ import { Job } from '@jobs/scraper/src/types'
 import { insertQueue, jobQueue, navQueue, rangeQueue } from './queues'
 import { AsyncReturnType } from 'type-fest'
 import { env } from '../../env'
+import superjson from 'superjson'
 
 const SALARY_STEP = 50
 const JOBS_THREADS = 5
@@ -15,6 +16,7 @@ const JOBS_THREADS = 5
 const CACHE_TTL = parseDuration(env.isProd ? '2 hours' : '1 week', 'sec')
 
 const client = createTRPCProxyClient<AppRouter>({
+  transformer: superjson,
   links: [
     httpLink({
       url: env.JOBS_SCRAPER_URL,
