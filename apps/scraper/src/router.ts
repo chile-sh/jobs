@@ -1,9 +1,9 @@
 import { publicProcedure, router } from './trpc'
 import { z } from 'zod'
 import { createGOB } from './scraper'
-import { getEnvVariable } from '@jobs/api-util/env'
+import { env } from './env'
 
-const gob = createGOB(getEnvVariable('GOB_SESSION'), getEnvVariable('GOB_CSRF_TOKEN'))
+const gob = createGOB(env.GOB_SESSION, env.GOB_CSRF_TOKEN)
 
 export const appRouter = router({
   filter: publicProcedure

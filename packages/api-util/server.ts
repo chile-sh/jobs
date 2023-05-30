@@ -1,8 +1,8 @@
-import { getEnvVariable } from '@jobs/api-util/env'
 import { fastifyTRPCPlugin } from '@trpc/server/adapters/fastify'
 import Fastify from 'fastify'
 import cors from '@fastify/cors'
 import ws from '@fastify/websocket'
+import { env } from './env'
 
 export const createFastify = async (
   serverName: string,
@@ -29,7 +29,7 @@ export const createFastify = async (
   }
 
   try {
-    const port = parseInt(getEnvVariable('PORT'))
+    const port = env.PORT
     await fastify.listen({ port })
     fastify.log.info({ port }, `Started [${serverName}] microservice`)
 

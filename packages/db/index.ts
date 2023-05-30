@@ -1,14 +1,7 @@
 import { Pool } from 'pg'
-import { validateEnv, envalid, getEnvVariable } from '@jobs/api-util/env'
 import { Kysely, PostgresDialect, RawBuilder, sql } from 'kysely'
 import { CompanyTable, CountryTable, JobTable, TagTable } from './tables'
-
-validateEnv({
-  POSTGRES_HOST: envalid.str(),
-  POSTGRES_USER: envalid.str(),
-  POSTGRES_PASSWORD: envalid.str(),
-  POSTGRES_DB: envalid.str({ default: 'jobs' }),
-})
+import { env } from './env'
 
 export * as pg from 'pg'
 export * as kysely from 'kysely'
@@ -27,10 +20,10 @@ export function toJson<T>(obj: T): RawBuilder<T> {
 export const db = new Kysely<Database>({
   dialect: new PostgresDialect({
     pool: new Pool({
-      host: getEnvVariable('POSTGRES_HOST'),
-      database: getEnvVariable('POSTGRES_DB'),
-      user: getEnvVariable('POSTGRES_USER'),
-      password: getEnvVariable('POSTGRES_PASSWORD'),
+      host: env.POSTGRES_HOST,
+      database: env.POSTGRES_DB,
+      user: env.POSTGRES_USER,
+      password: env.POSTGRES_PASSWORD,
     }),
   }),
 })

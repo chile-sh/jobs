@@ -2,9 +2,9 @@ import { logger } from '@jobs/api-util/logger'
 import { parseDuration, waitFor } from '@jobs/helpers'
 import type { AppRouter } from '@jobs/api/src/router'
 import { createTRPCProxyClient, httpLink } from '@trpc/client'
-import { getEnvVariable } from '@jobs/api-util/env'
 import { JobFullPayload } from './scraper'
 import { insertQueue } from './queues'
+import { env } from '../../env'
 
 const JOBS_THREADS = 2
 const QUEUE_END_TIMEOUT = parseDuration('1s')
@@ -12,7 +12,7 @@ const QUEUE_END_TIMEOUT = parseDuration('1s')
 const apiClient = createTRPCProxyClient<AppRouter>({
   links: [
     httpLink({
-      url: getEnvVariable('JOBS_API_URL'),
+      url: env.JOBS_API_URL,
     }),
   ],
 })

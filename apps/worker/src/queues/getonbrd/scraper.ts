@@ -1,7 +1,6 @@
 import Queue from 'bull'
 import { parseDuration } from '@jobs/helpers'
 import { createTRPCProxyClient, httpLink } from '@trpc/client'
-import { getEnvVariable } from '@jobs/api-util/env'
 import { redis } from '@jobs/api-util/redis'
 import type { AppRouter } from '@jobs/scraper/src/router'
 import { logger } from '@jobs/api-util/logger'
@@ -18,7 +17,7 @@ const CACHE_TTL = parseDuration(env.isProd ? '2 hours' : '1 week', 'sec')
 const client = createTRPCProxyClient<AppRouter>({
   links: [
     httpLink({
-      url: getEnvVariable('JOBS_SCRAPER_URL'),
+      url: env.JOBS_SCRAPER_URL,
     }),
   ],
 })
