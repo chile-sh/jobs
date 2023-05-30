@@ -3,7 +3,6 @@
   "include": ["src/**/*.ts", "src/**/*.json", ".env"],
   "exclude": ["node_modules"],
   "compilerOptions": {
-    "lib": ["esnext", "dom"],
     "outDir": "dist",
     "baseUrl": "src",
     "paths": {
