@@ -25,7 +25,7 @@ export interface Job {
   location_objects: {
     flag_url: string
     sentence: string
-    tenant_home: string
+    tenant_name: string
   }[]
   locations_to_sentence_short: string
   locations_to_sentence: string
@@ -34,17 +34,17 @@ export interface Job {
   min_salary?: number
   new: boolean
   no_remote: boolean
-  perks?: string[]
+  perks: string[]
   pinned: boolean
   portfolio_required: boolean
   published_at: string
   recommended: boolean
   remote_local: boolean
-  remote_modality: string
-  remote_zone: string
+  remote_modality?: string | null
+  remote_zone?: string | null
   remote: boolean
-  salary_type: string
-  salary: string
+  salary_type?: string | null
+  salary?: string | null
   seniority: string
   show_salary: boolean
   temporarily_remote: boolean
@@ -88,7 +88,7 @@ export interface JobData {
     modality?: string
     place?: string
   }
-  repliesIn?: [string, number, number | undefined]
+  repliesIn?: [string, number, ...number[]]
   requiresApplyingIn?: string
   salary?: {
     type: string
