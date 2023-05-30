@@ -2,7 +2,9 @@ import { fastifyTRPCPlugin } from '@trpc/server/adapters/fastify'
 import Fastify from 'fastify'
 import cors from '@fastify/cors'
 import ws from '@fastify/websocket'
-import { env } from './env'
+import { cleanEnv, port } from '@jobs/helpers/env'
+
+const env = cleanEnv(process.env, { PORT: port() })
 
 export const createFastify = async (
   serverName: string,
