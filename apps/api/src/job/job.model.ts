@@ -3,24 +3,26 @@ import { createCountry, findCountryByName } from '@/country/country.model'
 import type { InsertableCompany, InsertableCountry } from '@jobs/db/tables'
 import { db } from '@jobs/db'
 
-import { JobData } from '@/types'
+import { InsertableJob } from '@jobs/db/tables'
+import type { SetOptional } from 'type-fest'
 
-export const createJob = async (jobData: JobData, company: InsertableCompany, country: InsertableCountry) => {
+type InsertJobData = SetOptional<InsertableJob, 'company_id' | 'country_id'>
+
+export const createJob = async (jobData: InsertJobData, company: InsertableCompany, country: InsertableCountry) => {
   const foundCompany = await findCompanyByName(company.name)
   const foundCountry = await findCountryByName(country.name)
 
   const companyId = foundCompany?.id ?? (await createCompany(company)).id
   const countryId = foundCountry?.id ?? (await createCountry(country)).id
-  console.log({ companyId })
-  console.log({ countryId })
 
   // Create the job
-  await db
+  return db
     .insertInto('job')
     .values({
       ...jobData,
       company_id: companyId,
       country_id: countryId,
     })
-    .execute()
+    .returningAll()
+    .executeTakeFirstOrThrow()
 }
