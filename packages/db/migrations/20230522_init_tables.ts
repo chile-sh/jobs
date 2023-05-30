@@ -24,18 +24,25 @@ export async function up(db: Kysely<any>): Promise<void> {
     .createTable('country')
     .addColumn('id', 'serial', col => col.primaryKey())
     .addColumn('name', 'varchar(80)', col => col.notNull().unique())
-    .addColumn('code', 'varchar(3)', col => col.notNull().unique())
+    .addColumn('created_at', 'timestamp', col => col.defaultTo(sql`now()`).notNull())
+    .execute()
+
+  await db.schema
+    .createTable('city')
+    .addColumn('id', 'serial', col => col.primaryKey())
+    .addColumn('country_id', 'integer', col => col.references('country.id').notNull())
+    .addColumn('name', 'varchar(100)', col => col.notNull())
+    .addColumn('created_at', 'timestamp', col => col.defaultTo(sql`now()`).notNull())
     .execute()
 
   await db.schema
     .createTable('job')
     .addColumn('id', 'serial', col => col.primaryKey())
     .addColumn('company_id', 'integer', col => col.references('company.id').notNull())
-    .addColumn('country_id', 'integer', col => col.references('country.id').notNull())
+    .addColumn('city_id', 'integer', col => col.references('city.id'))
     .addColumn('area', 'varchar', col => col.notNull())
-    .addColumn('cities', 'varchar')
+    .addColumn('url', 'varchar')
     .addColumn('date', 'timestamptz')
-    .addColumn('description_headline', 'varchar', col => col.notNull())
     .addColumn('description', 'varchar', col => col.notNull())
     .addColumn('level', 'varchar', col => col.notNull())
     .addColumn('remote_hybrid', 'boolean')
@@ -62,5 +69,6 @@ export async function down(db: Kysely<any>): Promise<void> {
   await db.schema.dropTable('tag').execute()
   await db.schema.dropTable('job').execute()
   await db.schema.dropTable('company').execute()
+  await db.schema.dropTable('city').execute()
   await db.schema.dropTable('country').execute()
 }

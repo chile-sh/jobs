@@ -5,11 +5,13 @@
   "main": "index.ts",
   "scripts": {
     "lint": "eslint \"**/*.ts*\"",
-    "lint:fix": "npm run lint -- --fix"
+    "lint:fix": "npm run lint -- --fix",
+    "db:migrate": "tsx -r dotenv/config scripts/migrate.ts"
   },
   "devDependencies": {
     "@jobs/configs": "*",
     "@jobs/eslint-config-node": "*",
+    "@jobs/tsconfig": "*",
     "@types/pg": "^8.10.1"
   },
   "dependencies": {

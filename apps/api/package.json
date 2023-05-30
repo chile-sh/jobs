@@ -10,8 +10,7 @@
     "build": "tsc && tsc-alias",
     "build:swc": "swc src -d dist --source-maps --copy-files",
     "lint": "eslint \"**/*.ts*\"",
-    "lint:fix": "npm run lint -- --fix",
-    "db:migrate": "tsx -r dotenv/config db/migrate.ts"
+    "lint:fix": "npm run lint -- --fix"
   },
   "dependencies": {
     "@jobs/api-util": "*",

@@ -1,6 +1,7 @@
+#!/usr/bin/env tsx
+
 import path from 'node:path'
-import { validateEnv } from '@jobs/api-util/env'
-import { createMigrator } from '@jobs/db/run-migrations'
+import { createMigrator } from '../lib/create-migrator'
 import yargs from 'yargs/yargs'
 import { hideBin } from 'yargs/helpers'
 
@@ -13,14 +14,12 @@ const cmd = yargs(hideBin(process.argv))
   })
   .parseSync()
 
-validateEnv()
-
 const main = async () => {
   const { dir } = cmd
 
   if (!dir) return
 
-  const migrator = createMigrator(path.join(__dirname, 'migrations'))
+  const migrator = createMigrator(path.join(__dirname, '..', 'migrations'))
   const migrateDir = {
     up: () => migrator.migrate('latest'),
     down: () => migrator.migrate('down'),

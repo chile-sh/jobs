@@ -65,7 +65,7 @@ npm i fastify -w @jobs/api
 
 ```bash
 # options are --dir=up|down|latest
-npm run db:migrate -w @jobs/api -- --dir=up
+npm run db:migrate -w @jobs/db -- --dir=up
 ```
 
 ### Development
@@ -88,3 +88,4 @@ cz bump
 
 The devcontainer already comes with Commitizen and the [Conventional Commits extension](https://github.com/vivaxy/vscode-conventional-commits) for VSCode.
 
+> Useful when TypeScript starts acting up: `find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +`

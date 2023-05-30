@@ -8,6 +8,7 @@
     "lint:fix": "npm run lint -- --fix"
   },
   "devDependencies": {
+    "@jobs/helpers": "*",
     "@jobs/configs": "*",
     "@jobs/eslint-config-node": "*"
   },

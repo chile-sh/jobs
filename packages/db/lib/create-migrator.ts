@@ -1,7 +1,7 @@
 import * as path from 'path'
 import { promises as fs } from 'fs'
 import { Migrator, FileMigrationProvider } from 'kysely'
-import { db } from '@jobs/db'
+import { db } from '../index'
 
 export function createMigrator(migrationFolder: string) {
   const migrator = new Migrator({
@@ -15,7 +15,7 @@ export function createMigrator(migrationFolder: string) {
   })
 
   return {
-    async migrate(dir: 'up' | 'down' | 'latest' = 'up') {
+    async migrate(dir: 'up' | 'down' | 'latest') {
       if (!dir) throw Error('missing parameter "dir"')
 
       const migrateDir = {

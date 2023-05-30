@@ -2,14 +2,13 @@ import { ColumnType, Generated, Selectable, Insertable, Updateable, RawBuilder }
 
 export interface CountryTable {
   id: Generated<number>
-  name: string
-  code: string
+  name?: string
 }
 
 export interface CityTable {
   id: Generated<number>
-  name: string
-  country_id: number
+  name?: string
+  country_id?: number
 }
 
 export interface CompanyTable {
@@ -28,12 +27,10 @@ export interface TagTable {
 export interface JobTable {
   id: Generated<number>
   url: string
+  city_id?: number | null
   company_id: number
-  country_id: number
   area: string // programming, design, ...
-  cities: string | null
   date: ColumnType<Date, string | undefined, never>
-  description_headline: string
   description: string
   level: string // senior, ssr, ...
   tags?: number[]
@@ -47,11 +44,12 @@ export interface JobTable {
   remote_hybrid?: boolean
   remote_local?: boolean
   remote_temporarily?: boolean
-  remote_modality?: string
-  remote_zone?: string
+  remote_modality?: string | null
+  remote_zone?: string | null
   meta?: RawBuilder<{
     ext_id: number
     user_id: number
+    perks: string[]
     allows_quick_apply: boolean
     applications?: number
     hidden: boolean
@@ -62,7 +60,7 @@ export interface JobTable {
     github_required: boolean
     linkedin_required: boolean
     portfolio_required: boolean
-    replies_in?: [string, number, number?]
+    replies_in?: [string, number, ...number[]]
     requires_applying_in?: string
   }>
 }
@@ -71,6 +69,11 @@ export interface JobTable {
 export type Country = Selectable<CountryTable>
 export type InsertableCountry = Insertable<CountryTable>
 export type UpdateableCountry = Updateable<CountryTable>
+
+// City
+export type City = Selectable<CityTable>
+export type InsertableCity = Insertable<CityTable>
+export type UpdateableCity = Updateable<CityTable>
 
 // Company
 export type Company = Selectable<CompanyTable>
