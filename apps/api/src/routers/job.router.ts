@@ -1,7 +1,7 @@
 import { publicProcedure, router } from '../trpc'
 import { z } from 'zod'
-import { createJob } from './job.model'
-import { toJson } from '@/../../../packages/db'
+import { createJob } from '@/models/job.model'
+import { toJson } from '@jobs/db'
 
 export const jobRouter = router({
   insertJob: publicProcedure

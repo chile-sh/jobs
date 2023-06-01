@@ -1,4 +1,4 @@
-import { jobRouter } from './job/job.router'
+import { jobRouter } from './routers/job.router'
 import { router } from './trpc'
 
 export const appRouter = router({
