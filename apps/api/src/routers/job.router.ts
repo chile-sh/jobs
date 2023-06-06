@@ -29,6 +29,7 @@ export const jobRouter = router({
             max: z.number(),
             unit: z.string(),
             currency: z.string(),
+            guess: z.boolean().optional().default(false),
           })
           .optional(),
         remote: z
@@ -75,6 +76,7 @@ export const jobRouter = router({
           title: input.title,
           type: input.type,
           date: input.date.toDateString(),
+          salary_guess: input.salary?.guess,
           salary_currency: input.salary?.currency,
           salary_max: input.salary?.max,
           salary_min: input.salary?.min,

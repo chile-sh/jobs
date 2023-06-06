@@ -5,6 +5,8 @@ import { createTRPCProxyClient, httpLink } from '@trpc/client'
 import { JobFullPayload } from './scraper'
 import { insertQueue } from './queues'
 import { env } from '../../env'
+import { redis } from '@jobs/api-util/redis'
+import { Job } from '@jobs/scraper/src/types'
 import superjson from 'superjson'
 
 const JOBS_THREADS = 1
@@ -32,23 +34,37 @@ export const runInsertDb = async () => {
 
   insertQueue.process(JOBS_THREADS, async function (job) {
     jobsInserted.doing++
-    const { info, meta } = job.data as JobFullPayload
+    const { info, salaryRange } = job.data as JobFullPayload
+    const jobPath = info.url.replace('https://www.getonbrd.com', '')
+
+    const metaFromCache = await redis.hget('jobs:meta-cache', jobPath)
+    if (!metaFromCache) return job.moveToFailed({ message: `couldn't find meta cache: ${jobPath}` })
+
+    const meta: Job = JSON.parse(metaFromCache)
 
     const result = await apiClient.job.insertJob.mutate({
       area: info.area,
       company: info.company,
-      cities: meta.city,
-      country: { name: meta.country, code: 'n/a' },
+      cities: meta.location_objects.map(obj => obj.sentence).join(),
+      countries: meta.location_objects.map(obj => obj.tenant_name).join(),
       date: new Date(info.date),
-      salary: info.salary,
+      salary: info?.salary?.currency
+        ? info.salary
+        : salaryRange
+        ? {
+            currency: 'USD',
+            min: salaryRange[0],
+            max: salaryRange.at(-1) as number,
+            type: 'gross',
+            unit: 'MONTH',
+            guess: true,
+          }
+        : undefined,
       tags: info.tags,
       title: info.title,
       type: info.type,
       url: info.url,
-      description: {
-        text: info.description,
-        headline: meta.description_headline,
-      },
+      description: info.description,
       level: info.level,
       remote: {
         local: meta.remote_local,
@@ -71,9 +87,14 @@ export const runInsertDb = async () => {
         applications: info.applications,
         last_checked: info.lastChecked,
         replies_in: info.repliesIn,
+        perks: meta.perks,
         requires_applying_in: info.requiresApplyingIn,
       },
     })
+  })
+
+  insertQueue.on('failed', job => {
+    logger.error(job.data, job.failedReason)
   })
 
   insertQueue.on('completed', async function () {

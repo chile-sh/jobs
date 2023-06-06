@@ -45,6 +45,7 @@ export const createGOB = (session: string, token: string) => {
     const tags = $('[itemprop="skills"] > a')
       .map((_, el) => txt($(el)))
       .get()
+
     const _company = $('[itemprop="hiringOrganization"]')
     const company = {
       slug: _company
@@ -54,6 +55,7 @@ export const createGOB = (session: string, token: string) => {
       name: txt(_company.find('[itemprop="name"]')),
       logo: txt(_company.find('[itemprop="logo"]')),
     }
+
     const date = $(`[itemprop="datePosted"]`).attr('datetime') as string
     const url = $(`link[itemprop='url']`).attr('href') as string
     const locModality = _location.toLowerCase().match(/remote|hybrid/)?.[0]

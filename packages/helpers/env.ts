@@ -1,6 +1,6 @@
-import { ValidatorSpec, cleanEnv, port, str } from 'envalid'
+import { ValidatorSpec, cleanEnv, port, str, num, url } from 'envalid'
 
-export { cleanEnv, port, str }
+export { cleanEnv, port, str, num, url }
 
 export * as envalid from 'envalid'
 

@@ -36,6 +36,7 @@ export interface JobTable {
   tags?: number[]
   title: string
   type: string // FULL_TIME
+  salary_guess?: boolean
   salary_type?: string // net, gross
   salary_min?: number
   salary_max?: number
