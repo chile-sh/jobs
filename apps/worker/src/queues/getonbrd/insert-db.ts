@@ -1,5 +1,5 @@
 import { logger } from '@jobs/api-util/logger'
-import { parseDuration, waitFor } from '@jobs/helpers'
+import { parseDuration } from '@jobs/helpers'
 import type { AppRouter } from '@jobs/api/src/router'
 import { createTRPCProxyClient, httpLink } from '@trpc/client'
 import { JobFullPayload } from './scraper'
@@ -10,7 +10,7 @@ import { Job } from '@jobs/scraper/src/types'
 import superjson from 'superjson'
 
 const JOBS_THREADS = 1
-const QUEUE_END_TIMEOUT = parseDuration('1s')
+const QUEUE_END_TIMEOUT = parseDuration('20s')
 
 const apiClient = createTRPCProxyClient<AppRouter>({
   transformer: superjson,
@@ -43,10 +43,9 @@ export const runInsertDb = async () => {
     const meta: Job = JSON.parse(metaFromCache)
 
     const result = await apiClient.job.insertJob.mutate({
+      source: 'getonbrd',
       area: info.area,
       company: info.company,
-      cities: meta.location_objects.map(obj => obj.sentence).join(),
-      countries: meta.location_objects.map(obj => obj.tenant_name).join(),
       date: new Date(info.date),
       salary: info?.salary?.currency
         ? info.salary
@@ -76,6 +75,8 @@ export const runInsertDb = async () => {
       meta: {
         allows_quick_apply: meta.allows_quick_apply,
         ext_id: meta.id,
+        location_objects: meta.location_objects,
+        locations_to_sentence: meta.locations_to_sentence,
         github_required: meta.github_required,
         hidden: meta.hidden,
         is_hot: meta.is_hot,
@@ -90,6 +91,11 @@ export const runInsertDb = async () => {
         perks: meta.perks,
         requires_applying_in: info.requiresApplyingIn,
       },
+      places: meta.locations_to_sentence.split(/,\s?|\sor\s/).map(s => s.trim()),
+      placesArr: meta.location_objects.map(obj => ({
+        cities: obj.sentence.split(/,\s?|\sor\s/).map(s => s.trim()),
+        country: obj.tenant_name.trim(),
+      })),
     })
   })
 

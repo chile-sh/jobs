@@ -6,8 +6,8 @@ export async function up(db: Kysely<any>): Promise<void> {
   await db.schema
     .createTable('tag')
     .addColumn('id', 'serial', col => col.primaryKey())
-    .addColumn('tag', 'varchar(10)', col => col.notNull().unique())
-    .addColumn('description', 'varchar(100)', col => col.notNull().unique())
+    .addColumn('tag', 'varchar(50)', col => col.notNull().unique())
+    .addColumn('description', 'varchar(100)')
     .addColumn('created_at', 'timestamp', col => col.defaultTo(sql`now()`).notNull())
     .execute()
 
@@ -15,7 +15,7 @@ export async function up(db: Kysely<any>): Promise<void> {
     .createTable('company')
     .addColumn('id', 'serial', col => col.primaryKey())
     .addColumn('name', 'varchar(50)', col => col.notNull())
-    .addColumn('slug', 'varchar(50)', col => col.notNull().unique())
+    .addColumn('slug', 'varchar(255)', col => col.notNull().unique())
     .addColumn('logo', 'varchar', col => col.notNull().unique())
     .addColumn('created_at', 'timestamp', col => col.defaultTo(sql`now()`).notNull())
     .execute()
@@ -33,18 +33,19 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn('country_id', 'integer', col => col.references('country.id').notNull())
     .addColumn('name', 'varchar(100)', col => col.notNull())
     .addColumn('created_at', 'timestamp', col => col.defaultTo(sql`now()`).notNull())
+    .addUniqueConstraint('country_id_city_name_uniq', ['country_id', 'name'])
     .execute()
 
   await db.schema
     .createTable('job')
     .addColumn('id', 'serial', col => col.primaryKey())
     .addColumn('company_id', 'integer', col => col.references('company.id').notNull())
-    .addColumn('city_id', 'integer', col => col.references('city.id'))
     .addColumn('area', 'varchar', col => col.notNull())
     .addColumn('url', 'varchar', col => col.notNull().unique())
     .addColumn('date', 'timestamptz')
     .addColumn('description', 'varchar', col => col.notNull())
     .addColumn('level', 'varchar', col => col.notNull())
+    .addColumn('places', 'jsonb')
     .addColumn('remote_hybrid', 'boolean')
     .addColumn('remote_local', 'boolean')
     .addColumn('remote_modality', 'varchar')
@@ -52,14 +53,33 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn('remote_zone', 'varchar')
     .addColumn('title', 'varchar', col => col.notNull())
     .addColumn('type', 'varchar', col => col.notNull())
-    .addColumn('remote', 'jsonb')
     .addColumn('salary_guess', 'boolean', col => col.defaultTo(false))
     .addColumn('salary_min', 'integer')
     .addColumn('salary_max', 'integer')
     .addColumn('salary_type', 'varchar(20)')
     .addColumn('salary_unit', 'varchar(20)')
     .addColumn('salary_currency', 'varchar(10)')
+    .addColumn('source', 'varchar(50)')
     .addColumn('meta', 'jsonb')
+    .addColumn('created_at', 'timestamp', col => col.defaultTo(sql`now()`).notNull())
+    .execute()
+
+  await db.schema
+    .createTable('job_city')
+    .addColumn('id', 'serial', col => col.primaryKey())
+    .addColumn('city_id', 'integer', col => col.references('city.id').notNull())
+    .addColumn('job_id', 'integer', col => col.references('job.id').notNull())
+    .addColumn('enabled', 'boolean', col => col.defaultTo(true))
+    .addColumn('created_at', 'timestamp', col => col.defaultTo(sql`now()`).notNull())
+    .addUniqueConstraint('job_id_city_id_uniq', ['job_id', 'city_id'])
+    .execute()
+
+  await db.schema
+    .createTable('job_tag')
+    .addColumn('id', 'serial', col => col.primaryKey())
+    .addColumn('tag_id', 'integer', col => col.references('tag.id').notNull())
+    .addColumn('job_id', 'integer', col => col.references('job.id').notNull())
+    .addUniqueConstraint('job_id_tag_id_uniq', ['job_id', 'tag_id'])
     .addColumn('created_at', 'timestamp', col => col.defaultTo(sql`now()`).notNull())
     .execute()
 }
@@ -67,9 +87,11 @@ export async function up(db: Kysely<any>): Promise<void> {
 // TODO: use proper types
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function down(db: Kysely<any>): Promise<void> {
-  await db.schema.dropTable('tag').execute()
+  await db.schema.dropTable('job_city').execute()
+  await db.schema.dropTable('job_tag').execute()
   await db.schema.dropTable('job').execute()
-  await db.schema.dropTable('company').execute()
+  await db.schema.dropTable('tag').execute()
   await db.schema.dropTable('city').execute()
+  await db.schema.dropTable('company').execute()
   await db.schema.dropTable('country').execute()
 }

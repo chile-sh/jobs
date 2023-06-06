@@ -14,12 +14,14 @@ export const jobRouter = router({
           slug: z.string(),
           logo: z.string(),
         }),
-        countries: z.string().optional().nullable(),
         area: z.string(),
-        cities: z.string().optional().nullable(),
         date: z.date(),
         description: z.string(),
         level: z.string(),
+        placesArr: z
+          .array(z.object({ cities: z.array(z.string()).optional(), country: z.string().optional() }))
+          .optional(),
+        places: z.array(z.string()).optional(),
         tags: z.array(z.string()).optional(),
         type: z.string(),
         salary: z
@@ -32,6 +34,7 @@ export const jobRouter = router({
             guess: z.boolean().optional().default(false),
           })
           .optional(),
+        source: z.string(),
         remote: z
           .object({
             hybrid: z.boolean(),
@@ -47,6 +50,10 @@ export const jobRouter = router({
           perks: z.array(z.string()),
           allows_quick_apply: z.boolean(),
           applications: z.number().optional(),
+          location_objects: z
+            .array(z.object({ flag_url: z.string(), sentence: z.string(), tenant_name: z.string() }))
+            .optional(),
+          locations_to_sentence: z.string().optional(),
           hidden: z.boolean(),
           is_hot: z.boolean(),
           pinned: z.boolean(),
@@ -68,6 +75,7 @@ export const jobRouter = router({
           area: input.area,
           description: input.description,
           level: input.level,
+          places: input.places ? toJson(input.places) : undefined,
           remote_hybrid: input.remote?.hybrid,
           remote_local: input.remote?.local,
           remote_modality: input.remote?.modality,
@@ -82,17 +90,16 @@ export const jobRouter = router({
           salary_min: input.salary?.min,
           salary_type: input.salary?.type,
           salary_unit: input.salary?.unit,
+          source: input.source,
           meta: toJson(input.meta),
         },
         {
           company: input.company,
-          country: input.countries,
-          city: input.cities,
+          places: input.placesArr,
+          tags: input.tags,
         }
       )
 
-      return {
-        result: insertedJob,
-      }
+      return insertedJob
     }),
 })

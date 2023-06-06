@@ -58,7 +58,7 @@ const makeRange = (from = env.GOB_RANGE_START, to = env.GOB_RANGE_END, step = en
   return items
 }
 
-const JOB_QUEUE_CONFIG: Queue.JobOptions = { removeOnComplete: true, attempts: 5 }
+const JOB_QUEUE_CONFIG: Queue.JobOptions = { removeOnComplete: 10, removeOnFail: 10, attempts: 5 }
 
 export interface JobFullPayload {
   source: string
@@ -78,8 +78,8 @@ export const runScraper = async () => {
     for (const num of range.data) {
       navQueue.add({ num, offset: 0, remote: true }, JOB_QUEUE_CONFIG)
       jobsAdded.nav++
-      // navQueue.add({ num, offset: 0, remote: false }, JOB_QUEUE_CONFIG)
-      // jobsAdded.nav++
+      navQueue.add({ num, offset: 0, remote: false }, JOB_QUEUE_CONFIG)
+      jobsAdded.nav++
     }
   })
 
@@ -106,15 +106,16 @@ export const runScraper = async () => {
     const data: { path: string; salaryRange: number[] } = job.data
 
     const info = await getJobInfo(data.path)
+    const diff = +(data.salaryRange.at(-1) as number) - data.salaryRange[0]
     const salaryNotFound = data.salaryRange[0] === env.GOB_RANGE_START && data.salaryRange.at(-1) === env.GOB_RANGE_END
     const jobInfo: JobFullPayload = {
       source: 'getonbrd',
       info,
-      salaryRange: salaryNotFound ? undefined : data.salaryRange,
+      salaryRange: salaryNotFound || diff > env.GOB_RANGE_MAX_DIFF ? undefined : data.salaryRange,
     }
 
     logger.info(info.url, 'job queue url')
-    insertQueue.add(jobInfo, { removeOnComplete: true, attempts: 1 })
+    insertQueue.add(jobInfo, { removeOnComplete: true, removeOnFail: true })
   })
 
   jobQueue.on('completed', async function () {
@@ -137,7 +138,7 @@ export const runScraper = async () => {
   navQueue.on('completed', async job => {
     jobsCompleted.nav++
 
-    logger.info({ ...job.data, jobsCompleted }, 'nav queue [completed]')
+    logger.info({ jobsCompleted }, 'nav queue [completed]')
 
     if (!setTTL.nav) {
       await redis.expire('jobs:salaryRange', CACHE_TTL)
@@ -159,5 +160,5 @@ export const runScraper = async () => {
     }
   })
 
-  rangeQueue.add(makeRange(), { removeOnComplete: true })
+  rangeQueue.add(makeRange(), { removeOnComplete: true, removeOnFail: true })
 }
