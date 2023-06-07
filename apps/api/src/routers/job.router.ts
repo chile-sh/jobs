@@ -1,9 +1,21 @@
 import { publicProcedure, router } from '../trpc'
 import { z } from 'zod'
-import { createJob } from '@/models/job.model'
+import { createJob, getSources } from '@/models/job.model'
 import { toJson } from '@jobs/db'
 
 export const jobRouter = router({
+  getSources: publicProcedure.query(getSources),
+  navJobs: publicProcedure
+    .input(
+      z.object({
+        source: z.string().optional(),
+        offset: z.number().default(0).optional(),
+        search: z.string().optional(),
+      })
+    )
+    .query(async opts => {
+      console.log(opts.input)
+    }),
   insertJob: publicProcedure
     .input(
       z.object({
@@ -34,7 +46,7 @@ export const jobRouter = router({
             guess: z.boolean().optional().default(false),
           })
           .optional(),
-        source: z.string(),
+        sourceId: z.number(),
         remote: z
           .object({
             hybrid: z.boolean(),
@@ -72,6 +84,7 @@ export const jobRouter = router({
       const insertedJob = await createJob(
         {
           url: input.url,
+          source_id: input.sourceId,
           area: input.area,
           description: input.description,
           level: input.level,
@@ -90,7 +103,6 @@ export const jobRouter = router({
           salary_min: input.salary?.min,
           salary_type: input.salary?.type,
           salary_unit: input.salary?.unit,
-          source: input.source,
           meta: toJson(input.meta),
         },
         {
