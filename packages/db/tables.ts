@@ -65,7 +65,6 @@ export type UpdateableTag = Updateable<TagTable>
 export interface JobTable {
   id: Generated<number>
   url: string
-  city_id?: number | null
   company_id: number
   area: string // programming, design, ...
   date: ColumnType<Date, string | undefined, never>
@@ -81,7 +80,7 @@ export interface JobTable {
   salary_max?: number
   salary_unit?: string // MONTH
   salary_currency?: string // USD, CLP
-  source?: string // getonbrd, economicos, ...
+  source_id: number // getonbrd, economicos, ...
   remote_hybrid?: boolean
   remote_local?: boolean
   remote_temporarily?: boolean
@@ -111,6 +110,49 @@ export interface JobTable {
 export type Job = Selectable<JobTable>
 export type InsertableJob = Insertable<JobTable>
 export type UpdateableJob = Updateable<JobTable>
+
+// -------------------------------------------------
+// JobHistory - CVS
+export interface JobHistoryTable {
+  id: Generated<number>
+  archive_data: RawBuilder<InsertableJob>
+  source_id: number
+  version: number
+}
+
+export type JobHistory = Selectable<JobHistoryTable>
+export type InsertableJobHistory = Insertable<JobHistoryTable>
+export type UpdateableJobHistory = Updateable<JobHistoryTable>
+
+// -------------------------------------------------
+// JobVersion - CVS
+export interface JobVersionTable {
+  id: Generated<number>
+  version: number
+  source_id: number
+  duration?: number
+  errors?: number
+  total_jobs?: number
+  task_started_at: ColumnType<Date, string | undefined, never>
+  task_finished_at: ColumnType<Date, string | undefined, never>
+}
+
+export type JobVersion = Selectable<JobVersionTable>
+export type InsertableJobVersion = Insertable<JobVersionTable>
+export type UpdateableJobVersion = Updateable<JobVersionTable>
+
+// -------------------------------------------------
+// JobSource
+export interface JobSourceTable {
+  id: Generated<number>
+  name: string
+  slug: string
+  url: string
+}
+
+export type JobSource = Selectable<JobSourceTable>
+export type InsertableJobSource = Insertable<JobSourceTable>
+export type UpdateableJobSource = Updateable<JobSourceTable>
 
 // -------------------------------------------------
 // JobTag

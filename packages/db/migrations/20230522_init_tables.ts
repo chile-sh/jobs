@@ -4,6 +4,32 @@ import { Kysely, sql } from 'kysely'
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function up(db: Kysely<any>): Promise<void> {
   await db.schema
+    .createTable('job_source')
+    .addColumn('id', 'serial', col => col.primaryKey())
+    .addColumn('name', 'varchar(50)', col => col.notNull())
+    .addColumn('slug', 'varchar(50)', col => col.notNull().unique())
+    .addColumn('url', 'varchar', col => col.notNull().unique())
+    .execute()
+  await db.schema
+    .createTable('job_history')
+    .addColumn('id', 'serial', col => col.primaryKey())
+    .addColumn('archive_data', 'jsonb', col => col.notNull())
+    .addColumn('source_id', 'integer', col => col.references('job_source.id').notNull())
+    .addColumn('version', 'integer', col => col.notNull())
+    .execute()
+  await db.schema
+    .createTable('job_version')
+    .addColumn('id', 'serial', col => col.primaryKey())
+    .addColumn('version', 'integer', col => col.notNull())
+    .addColumn('source_id', 'integer', col => col.references('job_source.id').notNull())
+    .addColumn('duration', 'integer')
+    .addColumn('errors', 'integer')
+    .addColumn('total_jobs', 'integer')
+    .addColumn('task_started_at', 'timestamp', col => col.notNull())
+    .addColumn('task_finished_at', 'timestamp', col => col.notNull())
+    .execute()
+
+  await db.schema
     .createTable('tag')
     .addColumn('id', 'serial', col => col.primaryKey())
     .addColumn('tag', 'varchar(50)', col => col.notNull().unique())
@@ -17,6 +43,7 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn('name', 'varchar(50)', col => col.notNull())
     .addColumn('slug', 'varchar(255)', col => col.notNull().unique())
     .addColumn('logo', 'varchar', col => col.notNull().unique())
+    .addColumn('locations', 'jsonb')
     .addColumn('created_at', 'timestamp', col => col.defaultTo(sql`now()`).notNull())
     .execute()
 
@@ -39,6 +66,7 @@ export async function up(db: Kysely<any>): Promise<void> {
   await db.schema
     .createTable('job')
     .addColumn('id', 'serial', col => col.primaryKey())
+    .addColumn('source_id', 'integer', col => col.references('job_source.id').notNull())
     .addColumn('company_id', 'integer', col => col.references('company.id').notNull())
     .addColumn('area', 'varchar', col => col.notNull())
     .addColumn('url', 'varchar', col => col.notNull().unique())
@@ -59,7 +87,6 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn('salary_type', 'varchar(20)')
     .addColumn('salary_unit', 'varchar(20)')
     .addColumn('salary_currency', 'varchar(10)')
-    .addColumn('source', 'varchar(50)')
     .addColumn('meta', 'jsonb')
     .addColumn('created_at', 'timestamp', col => col.defaultTo(sql`now()`).notNull())
     .execute()
@@ -87,9 +114,12 @@ export async function up(db: Kysely<any>): Promise<void> {
 // TODO: use proper types
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function down(db: Kysely<any>): Promise<void> {
-  await db.schema.dropTable('job_city').execute()
   await db.schema.dropTable('job_tag').execute()
+  await db.schema.dropTable('job_city').execute()
   await db.schema.dropTable('job').execute()
+  await db.schema.dropTable('job_version').execute()
+  await db.schema.dropTable('job_history').execute()
+  await db.schema.dropTable('job_source').execute()
   await db.schema.dropTable('tag').execute()
   await db.schema.dropTable('city').execute()
   await db.schema.dropTable('company').execute()

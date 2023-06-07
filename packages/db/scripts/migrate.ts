@@ -12,10 +12,21 @@ const cmd = yargs(hideBin(process.argv))
     description: 'direction of the migration',
     choices: ['up', 'down', 'latest'],
   })
+  .option('seed', {
+    alias: 's',
+    type: 'string',
+    description: 'run seed',
+  })
   .parseSync()
 
 const main = async () => {
-  const { dir } = cmd
+  const { dir, seed } = cmd
+
+  if (seed) {
+    const seedRunner: { run: () => Promise<void> } = await import(`../seeds/${seed}`)
+    await seedRunner.run()
+    console.log(`seed ${seed} run succesfully`)
+  }
 
   if (!dir) return
 

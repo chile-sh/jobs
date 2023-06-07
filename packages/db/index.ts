@@ -1,6 +1,17 @@
 import { Pool } from 'pg'
 import { Kysely, PostgresDialect, RawBuilder, sql } from 'kysely'
-import { CityTable, CompanyTable, CountryTable, JobCityTable, JobTable, JobTagTable, TagTable } from './tables'
+import {
+  CityTable,
+  CompanyTable,
+  CountryTable,
+  JobCityTable,
+  JobHistoryTable,
+  JobSourceTable,
+  JobTable,
+  JobTagTable,
+  JobVersionTable,
+  TagTable,
+} from './tables'
 import { env } from './env'
 
 export * as pg from 'pg'
@@ -13,6 +24,9 @@ export interface Database {
   job: JobTable
   job_city: JobCityTable
   job_tag: JobTagTable
+  job_history: JobHistoryTable
+  job_version: JobVersionTable
+  job_source: JobSourceTable
   tag: TagTable
 }
 

@@ -4,6 +4,8 @@ import { insertQueue, jobQueue, navQueue, rangeQueue } from './queues'
 
 export { runScraper, runInsertDb }
 
+export const SCRAPER_SLUG = 'getonbrd'
+
 export const emptyQueues = async () => {
   await jobQueue.empty()
   await navQueue.empty()

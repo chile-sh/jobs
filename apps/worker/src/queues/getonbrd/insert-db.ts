@@ -8,6 +8,7 @@ import { env } from '../../env'
 import { redis } from '@jobs/api-util/redis'
 import { Job } from '@jobs/scraper/src/types'
 import superjson from 'superjson'
+import { SCRAPER_SLUG } from '.'
 
 const JOBS_THREADS = 1
 const QUEUE_END_TIMEOUT = parseDuration('20s')
@@ -30,6 +31,10 @@ export const runInsertDb = async () => {
   const jobsInserted = { doing: 0, done: 0 }
   let checkIfFinishedTimeout: ReturnType<typeof setTimeout>
 
+  const sourceCache = await apiClient.job.getSources.query()
+  const gobSource = sourceCache.find(src => src.slug === SCRAPER_SLUG)
+
+  if (!gobSource) throw Error(`source "${SCRAPER_SLUG}" not found`)
   logger.info('cleared queues')
 
   insertQueue.process(JOBS_THREADS, async function (job) {
@@ -42,8 +47,8 @@ export const runInsertDb = async () => {
 
     const meta: Job = JSON.parse(metaFromCache)
 
-    const result = await apiClient.job.insertJob.mutate({
-      source: 'getonbrd',
+    const res = await apiClient.job.insertJob.mutate({
+      sourceId: gobSource.id,
       area: info.area,
       company: info.company,
       date: new Date(info.date),
@@ -97,6 +102,8 @@ export const runInsertDb = async () => {
         country: obj.tenant_name.trim(),
       })),
     })
+
+    logger.info(res.insertedJob.id, 'job insert done')
   })
 
   insertQueue.on('failed', job => {
