@@ -11,6 +11,9 @@ Apps:
 Packages:
 - `@jobs/api-util`: Common shared methods between microservices.
 - `@jobs/configs`: Shared frontend configs.
+- `@jobs/db`: Database connection, config, and schema (kysely).
+- `@jobs/helpers`: Shared frontend/backend utilities.
+- `@jobs/ui`: React shared UI components.
 - `@jobs/eslint-config-next`
 - `@jobs/eslint-config-node`
 - `@jobs/tsconfig`
@@ -64,8 +67,11 @@ npm i fastify -w @jobs/api
 ### Run migrations
 
 ```bash
-# options are --dir=up|down|latest
+# Options are --dir=up|down|latest
 npm run db:migrate -w @jobs/db -- --dir=up
+
+# Specify seed file using --seed=seed_filename
+npm run db:migrate -w @jobs/db -- --seed=init_job_sources
 ```
 
 ### Development
