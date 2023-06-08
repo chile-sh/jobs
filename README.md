@@ -11,6 +11,7 @@ Apps:
 Packages:
 - `@jobs/api-util`: Common shared methods between microservices.
 - `@jobs/configs`: Shared frontend configs.
+
 - `@jobs/db`: Database connection, config, and schema.
 - `@jobs/helpers`: Shared frontend/backend utilities.
 - `@jobs/ui`: React shared UI components.
@@ -95,3 +96,4 @@ cz bump
 The devcontainer already comes with Commitizen and the [Conventional Commits extension](https://github.com/vivaxy/vscode-conventional-commits) for VSCode.
 
 > Useful when TypeScript starts acting up: `find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +`
+> If you are using the devcontainer and have to rebuild it, backup the ~/.zsh_history `cp ~/.zsh_history ./`
