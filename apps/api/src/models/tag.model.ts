@@ -1,4 +1,4 @@
-import { db, eq, inArray, NewTag, jobTags, tags } from '@jobs/db'
+import { db, eq, inArray, NewTag, jobsToTags, tags } from '@jobs/db'
 
 export const findTag = async (tag: string) => {
   const [found] = await db.select().from(tags).where(eq(tags.tag, tag)).execute()
@@ -16,10 +16,10 @@ export const getTagsByJobIds = async (jobIds: number[]) => {
       id: tags.id,
       tag: tags.tag,
       description: tags.description,
-      job_id: jobTags.job_id,
+      jobIds: jobsToTags.jobId,
     })
-    .from(jobTags)
-    .where(inArray(jobTags.job_id, jobIds))
-    .innerJoin(tags, eq(jobTags.tag_id, tags.id))
+    .from(jobsToTags)
+    .where(inArray(jobsToTags.jobId, jobIds))
+    .innerJoin(tags, eq(jobsToTags.tagId, tags.id))
     .execute()
 }

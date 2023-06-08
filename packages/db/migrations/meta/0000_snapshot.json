@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "pg",
-  "id": "b75a16dd-064a-4fab-86c6-b971ec92bf96",
+  "id": "a2195eef-fd6c-4af4-b45f-266e30cc6097",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "cities": {
@@ -37,10 +37,7 @@
       "indexes": {
         "cities_name_uniq_idx": {
           "name": "cities_name_uniq_idx",
-          "columns": [
-            "country_id",
-            "name"
-          ],
+          "columns": ["country_id", "name"],
           "isUnique": true
         }
       },
@@ -49,12 +46,8 @@
           "name": "cities_country_id_countries_id_fk",
           "tableFrom": "cities",
           "tableTo": "countries",
-          "columnsFrom": [
-            "country_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["country_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -106,9 +99,7 @@
       "indexes": {
         "companies_slug_uniq_idx": {
           "name": "companies_slug_uniq_idx",
-          "columns": [
-            "slug"
-          ],
+          "columns": ["slug"],
           "isUnique": true
         }
       },
@@ -142,94 +133,15 @@
       "indexes": {
         "countries_name_uniq_idx": {
           "name": "countries_name_uniq_idx",
-          "columns": [
-            "name"
-          ],
+          "columns": ["name"],
           "isUnique": true
         }
       },
       "foreignKeys": {},
       "compositePrimaryKeys": {}
     },
-    "job_city": {
-      "name": "job_city",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "serial",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "city_id": {
-          "name": "city_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "job_id": {
-          "name": "job_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "enabled": {
-          "name": "enabled",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": false,
-          "default": true
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {
-        "job_city_uniq_idx": {
-          "name": "job_city_uniq_idx",
-          "columns": [
-            "job_id",
-            "city_id"
-          ],
-          "isUnique": true
-        }
-      },
-      "foreignKeys": {
-        "job_city_city_id_cities_id_fk": {
-          "name": "job_city_city_id_cities_id_fk",
-          "tableFrom": "job_city",
-          "tableTo": "cities",
-          "columnsFrom": [
-            "city_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "job_city_job_id_jobs_id_fk": {
-          "name": "job_city_job_id_jobs_id_fk",
-          "tableFrom": "job_city",
-          "tableTo": "jobs",
-          "columnsFrom": [
-            "job_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {}
-    },
-    "job_history": {
-      "name": "job_history",
+    "jobs_history": {
+      "name": "jobs_history",
       "schema": "",
       "columns": {
         "id": {
@@ -266,24 +178,20 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "job_history_source_id_job_sources_id_fk": {
-          "name": "job_history_source_id_job_sources_id_fk",
-          "tableFrom": "job_history",
-          "tableTo": "job_sources",
-          "columnsFrom": [
-            "source_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+        "jobs_history_source_id_jobs_sources_id_fk": {
+          "name": "jobs_history_source_id_jobs_sources_id_fk",
+          "tableFrom": "jobs_history",
+          "tableTo": "jobs_sources",
+          "columnsFrom": ["source_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {}
     },
-    "job_sources": {
-      "name": "job_sources",
+    "jobs_sources": {
+      "name": "jobs_sources",
       "schema": "",
       "columns": {
         "id": {
@@ -319,89 +227,17 @@
         }
       },
       "indexes": {
-        "job_sources_url_uniq_idx": {
-          "name": "job_sources_url_uniq_idx",
-          "columns": [
-            "url"
-          ],
+        "jobs_sources_url_uniq_idx": {
+          "name": "jobs_sources_url_uniq_idx",
+          "columns": ["url"],
           "isUnique": true
         }
       },
       "foreignKeys": {},
       "compositePrimaryKeys": {}
     },
-    "job_tags": {
-      "name": "job_tags",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "serial",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "tag_id": {
-          "name": "tag_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "job_id": {
-          "name": "job_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {
-        "job_tags_uniq_idx": {
-          "name": "job_tags_uniq_idx",
-          "columns": [
-            "job_id",
-            "tag_id"
-          ],
-          "isUnique": true
-        }
-      },
-      "foreignKeys": {
-        "job_tags_tag_id_tags_id_fk": {
-          "name": "job_tags_tag_id_tags_id_fk",
-          "tableFrom": "job_tags",
-          "tableTo": "tags",
-          "columnsFrom": [
-            "tag_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "job_tags_job_id_jobs_id_fk": {
-          "name": "job_tags_job_id_jobs_id_fk",
-          "tableFrom": "job_tags",
-          "tableTo": "jobs",
-          "columnsFrom": [
-            "job_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {}
-    },
-    "job_versions": {
-      "name": "job_versions",
+    "jobs_versions": {
+      "name": "jobs_versions",
       "schema": "",
       "columns": {
         "id": {
@@ -455,16 +291,12 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "job_versions_source_id_job_sources_id_fk": {
-          "name": "job_versions_source_id_job_sources_id_fk",
-          "tableFrom": "job_versions",
-          "tableTo": "job_sources",
-          "columnsFrom": [
-            "source_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+        "jobs_versions_source_id_jobs_sources_id_fk": {
+          "name": "jobs_versions_source_id_jobs_sources_id_fk",
+          "tableFrom": "jobs_versions",
+          "tableTo": "jobs_sources",
+          "columnsFrom": ["source_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -625,23 +457,17 @@
       "indexes": {
         "jobs_url_uniq_idx": {
           "name": "jobs_url_uniq_idx",
-          "columns": [
-            "url"
-          ],
+          "columns": ["url"],
           "isUnique": true
         }
       },
       "foreignKeys": {
-        "jobs_source_id_job_sources_id_fk": {
-          "name": "jobs_source_id_job_sources_id_fk",
+        "jobs_source_id_jobs_sources_id_fk": {
+          "name": "jobs_source_id_jobs_sources_id_fk",
           "tableFrom": "jobs",
-          "tableTo": "job_sources",
-          "columnsFrom": [
-            "source_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "tableTo": "jobs_sources",
+          "columnsFrom": ["source_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -649,17 +475,124 @@
           "name": "jobs_company_id_companies_id_fk",
           "tableFrom": "jobs",
           "tableTo": "companies",
-          "columnsFrom": [
-            "company_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["company_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {}
+    },
+    "jobs_to_city": {
+      "name": "jobs_to_city",
+      "schema": "",
+      "columns": {
+        "city_id": {
+          "name": "city_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "job_id": {
+          "name": "job_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "enabled": {
+          "name": "enabled",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "jobs_to_city_city_id_cities_id_fk": {
+          "name": "jobs_to_city_city_id_cities_id_fk",
+          "tableFrom": "jobs_to_city",
+          "tableTo": "cities",
+          "columnsFrom": ["city_id"],
+          "columnsTo": ["id"],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "jobs_to_city_job_id_jobs_id_fk": {
+          "name": "jobs_to_city_job_id_jobs_id_fk",
+          "tableFrom": "jobs_to_city",
+          "tableTo": "jobs",
+          "columnsFrom": ["job_id"],
+          "columnsTo": ["id"],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "jobs_to_city_job_id_city_id": {
+          "name": "jobs_to_city_job_id_city_id",
+          "columns": ["job_id", "city_id"]
+        }
+      }
+    },
+    "jobs_to_tags": {
+      "name": "jobs_to_tags",
+      "schema": "",
+      "columns": {
+        "tag_id": {
+          "name": "tag_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "job_id": {
+          "name": "job_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "jobs_to_tags_tag_id_tags_id_fk": {
+          "name": "jobs_to_tags_tag_id_tags_id_fk",
+          "tableFrom": "jobs_to_tags",
+          "tableTo": "tags",
+          "columnsFrom": ["tag_id"],
+          "columnsTo": ["id"],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "jobs_to_tags_job_id_jobs_id_fk": {
+          "name": "jobs_to_tags_job_id_jobs_id_fk",
+          "tableFrom": "jobs_to_tags",
+          "tableTo": "jobs",
+          "columnsFrom": ["job_id"],
+          "columnsTo": ["id"],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "jobs_to_tags_job_id_tag_id": {
+          "name": "jobs_to_tags_job_id_tag_id",
+          "columns": ["job_id", "tag_id"]
+        }
+      }
     },
     "tags": {
       "name": "tags",
@@ -694,9 +627,7 @@
       "indexes": {
         "tags_tag_uniq_idx": {
           "name": "tags_tag_uniq_idx",
-          "columns": [
-            "tag"
-          ],
+          "columns": ["tag"],
           "isUnique": true
         }
       },

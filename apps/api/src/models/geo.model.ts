@@ -1,4 +1,4 @@
-import { db, NewCountry, eq, inArray, cities, countries, jobCities } from '@jobs/db'
+import { db, NewCountry, eq, inArray, cities, countries, jobsToCities } from '@jobs/db'
 
 export const findCountryByName = async (name: string) => {
   const [country] = await db.select().from(countries).where(eq(countries.name, name)).execute()
@@ -15,27 +15,27 @@ export const findCityByName = async (name: string, countryId: number) => {
     .select()
     .from(cities)
     .where(eq(cities.name, name))
-    .where(eq(cities.country_id, countryId))
+    .where(eq(cities.countryId, countryId))
     .execute()
 
   return city
 }
 
 export const createCity = async (name: string, countryId: number) => {
-  const [inserted] = await db.insert(cities).values({ name, country_id: countryId }).returning().execute()
+  const [inserted] = await db.insert(cities).values({ name, countryId }).returning().execute()
   return inserted
 }
 
 export const getPlacesByCityIds = async (cityIds: number[]) => {
   return db
     .select({
-      country_id: countries.id,
-      city_id: cities.id,
-      city_name: cities.name,
-      country_name: countries.name,
+      countryId: countries.id,
+      cityId: cities.id,
+      cityName: cities.name,
+      countryName: countries.name,
     })
     .from(cities)
-    .innerJoin(countries, eq(cities.country_id, countries.id))
+    .innerJoin(countries, eq(cities.countryId, countries.id))
     .where(inArray(cities.id, cityIds))
 }
 
@@ -43,9 +43,9 @@ export const getCitiesByJobIds = async (jobIds: number[]) => {
   return db
     .select({
       cityId: cities.id,
-      jobId: jobCities.job_id,
+      jobId: jobsToCities.jobId,
     })
-    .from(jobCities)
-    .innerJoin(cities, eq(jobCities.city_id, cities.id))
-    .where(inArray(jobCities.job_id, jobIds))
+    .from(jobsToCities)
+    .innerJoin(cities, eq(jobsToCities.cityId, cities.id))
+    .where(inArray(jobsToCities.jobId, jobIds))
 }

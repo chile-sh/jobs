@@ -1,6 +1,6 @@
 {
   "extends": "@jobs/tsconfig/api.json",
-  "include": ["src/**/*.ts", "src/**/*.json", ".env"],
+  "include": ["src/**/*.ts", "src/**/*.json", ".env", "package.json"],
   "exclude": ["node_modules"],
   "compilerOptions": {
     "outDir": "dist",

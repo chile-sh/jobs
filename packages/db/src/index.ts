@@ -2,6 +2,8 @@ import { drizzle } from 'drizzle-orm/node-postgres'
 import { Pool } from 'pg'
 import { env } from 'process'
 
+import * as schema from './schema'
+
 export * from './schema'
 export * from 'drizzle-orm'
 
@@ -12,4 +14,4 @@ const pool = new Pool({
   password: env.POSTGRES_PASSWORD,
 })
 
-export const db = drizzle(pool)
+export const db = drizzle(pool, { schema })

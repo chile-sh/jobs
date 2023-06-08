@@ -20,15 +20,7 @@ CREATE TABLE IF NOT EXISTS "countries" (
 	"created_at" timestamp DEFAULT now() NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS "job_city" (
-	"id" serial PRIMARY KEY NOT NULL,
-	"city_id" integer NOT NULL,
-	"job_id" integer NOT NULL,
-	"enabled" boolean DEFAULT true,
-	"created_at" timestamp DEFAULT now() NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS "job_history" (
+CREATE TABLE IF NOT EXISTS "jobs_history" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"archive_data" jsonb NOT NULL,
 	"source_id" integer NOT NULL,
@@ -36,7 +28,7 @@ CREATE TABLE IF NOT EXISTS "job_history" (
 	"created_at" timestamp DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS "job_sources" (
+CREATE TABLE IF NOT EXISTS "jobs_sources" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"name" varchar(50) NOT NULL,
 	"slug" varchar(50) NOT NULL,
@@ -44,14 +36,7 @@ CREATE TABLE IF NOT EXISTS "job_sources" (
 	"created" timestamp DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS "job_tags" (
-	"id" serial PRIMARY KEY NOT NULL,
-	"tag_id" integer NOT NULL,
-	"job_id" integer NOT NULL,
-	"created_at" timestamp DEFAULT now() NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS "job_versions" (
+CREATE TABLE IF NOT EXISTS "jobs_versions" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"version" integer NOT NULL,
 	"source_id" integer NOT NULL,
@@ -89,6 +74,23 @@ CREATE TABLE IF NOT EXISTS "jobs" (
 	"created_at" timestamp DEFAULT now() NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS "jobs_to_city" (
+	"city_id" integer NOT NULL,
+	"job_id" integer NOT NULL,
+	"enabled" boolean DEFAULT true,
+	"created_at" timestamp DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+ALTER TABLE "jobs_to_city" ADD CONSTRAINT "jobs_to_city_job_id_city_id" PRIMARY KEY("job_id","city_id");
+
+CREATE TABLE IF NOT EXISTS "jobs_to_tags" (
+	"tag_id" integer NOT NULL,
+	"job_id" integer NOT NULL,
+	"created_at" timestamp DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+ALTER TABLE "jobs_to_tags" ADD CONSTRAINT "jobs_to_tags_job_id_tag_id" PRIMARY KEY("job_id","tag_id");
+
 CREATE TABLE IF NOT EXISTS "tags" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"tag" varchar(50) NOT NULL,
@@ -99,9 +101,7 @@ CREATE TABLE IF NOT EXISTS "tags" (
 CREATE UNIQUE INDEX IF NOT EXISTS "cities_name_uniq_idx" ON "cities" ("country_id","name");
 CREATE UNIQUE INDEX IF NOT EXISTS "companies_slug_uniq_idx" ON "companies" ("slug");
 CREATE UNIQUE INDEX IF NOT EXISTS "countries_name_uniq_idx" ON "countries" ("name");
-CREATE UNIQUE INDEX IF NOT EXISTS "job_city_uniq_idx" ON "job_city" ("job_id","city_id");
-CREATE UNIQUE INDEX IF NOT EXISTS "job_sources_url_uniq_idx" ON "job_sources" ("url");
-CREATE UNIQUE INDEX IF NOT EXISTS "job_tags_uniq_idx" ON "job_tags" ("job_id","tag_id");
+CREATE UNIQUE INDEX IF NOT EXISTS "jobs_sources_url_uniq_idx" ON "jobs_sources" ("url");
 CREATE UNIQUE INDEX IF NOT EXISTS "jobs_url_uniq_idx" ON "jobs" ("url");
 CREATE UNIQUE INDEX IF NOT EXISTS "tags_tag_uniq_idx" ON "tags" ("tag");
 DO $$ BEGIN
@@ -111,49 +111,49 @@ EXCEPTION
 END $$;
 
 DO $$ BEGIN
- ALTER TABLE "job_city" ADD CONSTRAINT "job_city_city_id_cities_id_fk" FOREIGN KEY ("city_id") REFERENCES "cities"("id") ON DELETE no action ON UPDATE no action;
+ ALTER TABLE "jobs_history" ADD CONSTRAINT "jobs_history_source_id_jobs_sources_id_fk" FOREIGN KEY ("source_id") REFERENCES "jobs_sources"("id") ON DELETE no action ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
 
 DO $$ BEGIN
- ALTER TABLE "job_city" ADD CONSTRAINT "job_city_job_id_jobs_id_fk" FOREIGN KEY ("job_id") REFERENCES "jobs"("id") ON DELETE no action ON UPDATE no action;
+ ALTER TABLE "jobs_versions" ADD CONSTRAINT "jobs_versions_source_id_jobs_sources_id_fk" FOREIGN KEY ("source_id") REFERENCES "jobs_sources"("id") ON DELETE no action ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
 
 DO $$ BEGIN
- ALTER TABLE "job_history" ADD CONSTRAINT "job_history_source_id_job_sources_id_fk" FOREIGN KEY ("source_id") REFERENCES "job_sources"("id") ON DELETE no action ON UPDATE no action;
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
-
-DO $$ BEGIN
- ALTER TABLE "job_tags" ADD CONSTRAINT "job_tags_tag_id_tags_id_fk" FOREIGN KEY ("tag_id") REFERENCES "tags"("id") ON DELETE no action ON UPDATE no action;
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
-
-DO $$ BEGIN
- ALTER TABLE "job_tags" ADD CONSTRAINT "job_tags_job_id_jobs_id_fk" FOREIGN KEY ("job_id") REFERENCES "jobs"("id") ON DELETE no action ON UPDATE no action;
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
-
-DO $$ BEGIN
- ALTER TABLE "job_versions" ADD CONSTRAINT "job_versions_source_id_job_sources_id_fk" FOREIGN KEY ("source_id") REFERENCES "job_sources"("id") ON DELETE no action ON UPDATE no action;
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
-
-DO $$ BEGIN
- ALTER TABLE "jobs" ADD CONSTRAINT "jobs_source_id_job_sources_id_fk" FOREIGN KEY ("source_id") REFERENCES "job_sources"("id") ON DELETE no action ON UPDATE no action;
+ ALTER TABLE "jobs" ADD CONSTRAINT "jobs_source_id_jobs_sources_id_fk" FOREIGN KEY ("source_id") REFERENCES "jobs_sources"("id") ON DELETE no action ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
 
 DO $$ BEGIN
  ALTER TABLE "jobs" ADD CONSTRAINT "jobs_company_id_companies_id_fk" FOREIGN KEY ("company_id") REFERENCES "companies"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+
+DO $$ BEGIN
+ ALTER TABLE "jobs_to_city" ADD CONSTRAINT "jobs_to_city_city_id_cities_id_fk" FOREIGN KEY ("city_id") REFERENCES "cities"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+
+DO $$ BEGIN
+ ALTER TABLE "jobs_to_city" ADD CONSTRAINT "jobs_to_city_job_id_jobs_id_fk" FOREIGN KEY ("job_id") REFERENCES "jobs"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+
+DO $$ BEGIN
+ ALTER TABLE "jobs_to_tags" ADD CONSTRAINT "jobs_to_tags_tag_id_tags_id_fk" FOREIGN KEY ("tag_id") REFERENCES "tags"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+
+DO $$ BEGIN
+ ALTER TABLE "jobs_to_tags" ADD CONSTRAINT "jobs_to_tags_job_id_jobs_id_fk" FOREIGN KEY ("job_id") REFERENCES "jobs"("id") ON DELETE no action ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
