@@ -22,7 +22,7 @@ Packages:
 ## Setup
 
 In your local environment, make sure the `DEVCONTAINER_CPUS` is set to a number of cpu's below the number of total
-that you have on your machine (e.g 8 cores -> 6 cores for the container)
+that you have on your machine (e.g 8 cores -> 6 cores for the container).
 
 ### Run docker compose
 
@@ -95,5 +95,10 @@ cz bump
 
 The devcontainer already comes with Commitizen and the [Conventional Commits extension](https://github.com/vivaxy/vscode-conventional-commits) for VSCode.
 
-> Useful when TypeScript starts acting up: `find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +`
+#### Useful
+
+> If TypeScript starts acting up: `find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +`
+
 > If you are using the devcontainer and have to rebuild it, backup the ~/.zsh_history `cp ~/.zsh_history ./`
+
+> Killing a node process: `./util/kill-node-port.sh 3000` or `./util/kill-node.sh`
