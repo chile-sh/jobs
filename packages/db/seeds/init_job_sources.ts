@@ -1,8 +1,8 @@
-import { db } from '..'
+import { db, jobSources } from '../src'
 
 export const run = async () => {
   await db
-    .insertInto('job_source')
+    .insert(jobSources)
     .values([{ name: 'getonboard', slug: 'getonbrd', url: 'https://www.getonbrd.com' }])
     .execute()
 }

@@ -1,10 +1,16 @@
-import { db } from '@jobs/db'
-import type { Company, InsertableCompany } from '@jobs/db/tables'
+import { db, eq, NewCompany, companies } from '@jobs/db'
 
-export const findCompanyByName = async (name: string): Promise<Company | undefined> => {
-  return db.selectFrom('company').selectAll().where('name', '=', name).executeTakeFirst()
+export const findCompanyByName = async (name: string) => {
+  const [company] = await db.select().from(companies).where(eq(companies.name, name)).execute()
+  return company
 }
 
-export const createCompany = async (company: InsertableCompany) => {
-  return db.insertInto('company').values(company).returning('id').executeTakeFirstOrThrow()
+export const createCompany = async (company: NewCompany) => {
+  const [inserted] = await db
+    .insert(companies)
+    .values(company)
+    .onConflictDoUpdate({ target: companies.slug, set: company })
+    .returning()
+    .execute()
+  return inserted
 }

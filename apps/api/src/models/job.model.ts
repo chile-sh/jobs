@@ -1,36 +1,28 @@
 import { createCompany, findCompanyByName } from '@/models/company.model'
+import { createCountry, createCity, findCountryByName, findCityByName } from '@/models/geo.model'
 import {
-  createCountry,
-  createCity,
-  findCountryByName,
-  findCityByName,
-  getCitiesByJobIds,
-  getPlacesByCityIds,
-} from '@/models/geo.model'
-import type { InsertableCompany } from '@jobs/db/tables'
-import { db } from '@jobs/db'
+  cities,
+  companies,
+  countries,
+  db,
+  eq,
+  ilike,
+  jobCities,
+  jobs as jobsT,
+  jobSources,
+  jobTags,
+  NewCompany,
+  NewJob,
+  sql,
+  tags as tagsT,
+} from '@jobs/db'
 
-import { InsertableJob } from '@jobs/db/tables'
 import type { SetOptional } from 'type-fest'
-import { getTagsByJobIds } from './tag.model'
-
-type InsertJobData = SetOptional<InsertableJob, 'company_id'>
 
 const MAX_LIMIT = 50
 
-// Fetch cities and countries info from jobCities
-
-const getJobIdsByTags = async (tags: string[]) => {
-  return db
-    .selectFrom('job_tag as jt')
-    .innerJoin('tag as t', 't.id', 'jt.tag_id')
-    .where('t.tag', 'in', tags)
-    .select('jt.job_id')
-    .execute()
-}
-
 export const getSources = async () => {
-  return db.selectFrom('job_source').selectAll().execute()
+  return db.select().from(jobSources).execute()
 }
 
 export const navJobs = async ({
@@ -41,95 +33,36 @@ export const navJobs = async ({
   limit?: number
   offset?: number
   filters?: {
-    source?: string
     search?: string
-    tags?: string[]
   }
 }) => {
   if (limit > MAX_LIMIT) throw Error(`max limit: ${MAX_LIMIT}`)
 
-  let jobsQry = db.selectFrom('job')
+  let jobsQry = db.select({ job: jobsT, company: companies, cities, countries }).from(jobsT)
 
   if (filters?.search?.length) {
-    jobsQry = jobsQry.where('job.title', 'ilike', filters.search)
+    jobsQry = jobsQry.where(ilike(jobsT.title, filters.search))
   }
 
-  if (filters?.source) {
-    jobsQry = jobsQry.where('source_id', '=', eb =>
-      eb
-        .selectFrom('job_source')
-        .select('id')
-        .where('name', '=', filters.source as string)
-    )
-  }
+  const jobs = await jobsQry
+    .leftJoin(companies, eq(jobsT.company_id, companies.id))
+    .leftJoin(jobCities, eq(jobCities.job_id, jobsT.id))
+    .leftJoin(cities, eq(cities.id, jobCities.city_id))
+    .offset(offset)
+    .limit(limit)
+    .execute()
 
-  let filteredJobIdsByTags: number[] | undefined
-  if (filters?.tags?.length) {
-    filteredJobIdsByTags = (await getJobIdsByTags(filters.tags)).map(job => job.job_id)
-  }
-
-  if (filteredJobIdsByTags?.length) {
-    jobsQry = jobsQry.where('job.id', 'in', filteredJobIdsByTags)
-  }
-
-  const jobs = await jobsQry.selectAll('job').offset(offset).limit(limit).execute()
-
-  if (!jobs.length) return []
-  const jobIds = jobs.map(job => job.id)
-
-  // Fetch only cities from the jobs results
-  const jobCities = await getCitiesByJobIds(jobIds)
-
-  // Fetch cities and countries info from jobCities
-  const places = await getPlacesByCityIds(jobCities.map(jc => jc.cityId))
-  const tags = await getTagsByJobIds(jobIds)
-
-  const jobIdTagMap: Map<number, Set<string>> = new Map()
-  const cityIdMap: Map<number, Set<{ country?: string; city?: string }>> = new Map()
-
-  // cities to Map
-  for (const place of places) {
-    const val = cityIdMap.get(place.city_id)
-    const obj = { country: place.country_name, city: place.city_name }
-    if (val) {
-      val.add(obj)
-      continue
-    }
-    cityIdMap.set(place.city_id, new Set([obj]))
-  }
-
-  // tags to Map
-  for (const tag of tags) {
-    const val = jobIdTagMap.get(tag.job_id)
-    if (val) {
-      val.add(tag.tag)
-      continue
-    }
-    jobIdTagMap.set(tag.job_id, new Set([tag.tag]))
-  }
-
-  return {
-    jobs: jobs.map(job => {
-      return {
-        ...job,
-        places: jobCities
-          .filter(cty => cty.jobId === job.id)
-          .map(cty => [...(cityIdMap.get(cty.cityId)?.values() || [])])
-          .flat(),
-        tags: [...(jobIdTagMap.get(job.id)?.values() || [])],
-      }
-    }),
-  }
+  return jobs
 }
 
 export const createJob = async (
-  jobData: InsertJobData,
+  jobData: SetOptional<NewJob, 'company_id'>,
   {
     company,
     places,
     tags,
   }: {
-    company: InsertableCompany
+    company: NewCompany
     places?: {
       country?: string
       cities?: string[]
@@ -139,6 +72,7 @@ export const createJob = async (
 ) => {
   const cityIds: Set<number> = new Set()
 
+  // TODO: optimize
   if (places?.length) {
     for (const { cities, country } of places) {
       if (!country) continue
@@ -148,9 +82,9 @@ export const createJob = async (
 
       if (!cities) continue
 
-      for (const city of cities) {
-        const foundCity = foundCountry ? await findCityByName(city, foundCountry.id) : undefined
-        const cityId = foundCity?.id ?? (await createCity(city, countryId)).id
+      for (const cityName of cities) {
+        const foundCity = foundCountry ? await findCityByName(cityName, foundCountry.id) : undefined
+        const cityId = foundCity?.id ?? (await createCity(cityName, countryId)).id
         cityIds.add(cityId)
       }
     }
@@ -165,46 +99,47 @@ export const createJob = async (
   }
 
   // Create the job
-  const createJobQry = db
-    .insertInto('job')
+  const [insertedJob] = await db
+    .insert(jobsT)
     .values(insertValues)
-    .returningAll()
-    .onConflict(oc => oc.column('url').doUpdateSet(insertValues))
+    .onConflictDoUpdate({ target: jobsT.url, set: insertValues })
+    .returning()
+    .execute()
 
-  const insertedJob = await createJobQry.executeTakeFirstOrThrow()
-
+  // TODO: optimize
   if (tags?.length) {
-    for (const tag of tags) {
-      // TODO: make only one query
-      const { id } = await db
-        .insertInto('tag')
-        .values({ tag })
-        .returningAll()
-        .onConflict(oc => oc.column('tag').doUpdateSet({ tag }))
-        .executeTakeFirstOrThrow()
+    for (const tagName of tags) {
+      const [{ id: tagId }] = await db
+        .insert(tagsT)
+        .values({ tag: tagName })
+        .onConflictDoUpdate({ target: tagsT.tag, set: { tag: tagName } })
+        .returning()
+        .execute()
 
       await db
-        .insertInto('job_tag')
-        .values({ job_id: insertedJob.id, tag_id: id })
-        .returningAll()
-        .onConflict(oc => oc.constraint('job_id_tag_id_uniq').doUpdateSet({ job_id: insertedJob.id, tag_id: id }))
+        .insert(jobTags)
+        .values({ job_id: insertedJob.id, tag_id: tagId })
+        .onConflictDoUpdate({
+          target: [jobTags.job_id, jobTags.tag_id],
+          set: { job_id: insertedJob.id, tag_id: tagId },
+        })
         .execute()
     }
   }
 
-  // TODO: update/upsert cities instead of adding
   const citiesToUpsert = [...cityIds].map(id => ({ enabled: true, city_id: id, job_id: insertedJob.id }))
 
   if (citiesToUpsert.length) {
     await db
-      .insertInto('job_city')
+      .insert(jobCities)
       .values(citiesToUpsert)
-      .onConflict(oc =>
-        oc.constraint('job_id_city_id_uniq').doUpdateSet(eb => ({
-          city_id: eb.ref('excluded.city_id'),
-          job_id: eb.ref('excluded.job_id'),
-        }))
-      )
+      .onConflictDoUpdate({
+        target: [jobCities.job_id, jobCities.city_id],
+        set: {
+          city_id: sql`excluded.city_id`,
+          job_id: sql`excluded.job_id`,
+        },
+      })
       .execute()
   }
 

@@ -1,17 +1,25 @@
-import { InsertableTag, Tag } from '@jobs/db/tables'
-import { db } from '@jobs/db'
+import { db, eq, inArray, NewTag, jobTags, tags } from '@jobs/db'
 
-export const findTag = async (tag: string): Promise<Tag | undefined> =>
-  db.selectFrom('tag').selectAll().where('tag', '=', tag).executeTakeFirst()
+export const findTag = async (tag: string) => {
+  const [found] = await db.select().from(tags).where(eq(tags.tag, tag)).execute()
+  return found
+}
 
-export const createTag = async (tag: InsertableTag) =>
-  db.insertInto('tag').values(tag).returning('id').executeTakeFirstOrThrow()
+export const createTag = async (tag: NewTag) => {
+  const [inserted] = await db.insert(tags).values(tag).returning().execute()
+  return inserted
+}
 
 export const getTagsByJobIds = async (jobIds: number[]) => {
   return db
-    .selectFrom('job_tag as jt')
-    .where('jt.job_id', 'in', jobIds)
-    .innerJoin('tag as t', 't.id', 'jt.tag_id')
-    .select(['t.id', 't.tag', 't.description', 'job_id'])
+    .select({
+      id: tags.id,
+      tag: tags.tag,
+      description: tags.description,
+      job_id: jobTags.job_id,
+    })
+    .from(jobTags)
+    .where(inArray(jobTags.job_id, jobIds))
+    .innerJoin(tags, eq(jobTags.tag_id, tags.id))
     .execute()
 }
