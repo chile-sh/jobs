@@ -2,20 +2,24 @@
   "name": "@jobs/db",
   "version": "0.0.0",
   "private": true,
-  "main": "index.ts",
+  "main": "src/index.ts",
   "scripts": {
     "lint": "eslint \"**/*.ts*\"",
     "lint:fix": "npm run lint -- --fix",
-    "db:migrate": "tsx -r dotenv/config scripts/migrate.ts"
+    "db:generate": "drizzle-kit generate:pg",
+    "db:up": "drizzle-kit up:pg",
+    "db:drop": "drizzle-kit drop:pg",
+    "db:seed": "tsx -r dotenv/config ./scripts/seed.ts"
   },
   "devDependencies": {
     "@jobs/configs": "*",
     "@jobs/eslint-config-node": "*",
     "@jobs/tsconfig": "*",
-    "@types/pg": "^8.10.1"
+    "@types/pg": "^8.10.1",
+    "drizzle-kit": "^0.18.1"
   },
   "dependencies": {
-    "kysely": "^0.24.2",
+    "drizzle-orm": "^0.26.5",
     "pg": "^8.11.0"
   }
 }

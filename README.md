@@ -11,7 +11,7 @@ Apps:
 Packages:
 - `@jobs/api-util`: Common shared methods between microservices.
 - `@jobs/configs`: Shared frontend configs.
-- `@jobs/db`: Database connection, config, and schema (kysely).
+- `@jobs/db`: Database connection, config, and schema.
 - `@jobs/helpers`: Shared frontend/backend utilities.
 - `@jobs/ui`: React shared UI components.
 - `@jobs/eslint-config-next`
@@ -64,14 +64,14 @@ To install a dependency on a repo:
 npm i fastify -w @jobs/api
 ```
 
-### Run migrations
+### Run drizzle-orm generator and seed
 
 ```bash
 # Options are --dir=up|down|latest
-npm run db:migrate -w @jobs/db -- --dir=up
+npm run db:generate -w @jobs/db
 
 # Specify seed file using --seed=seed_filename
-npm run db:migrate -w @jobs/db -- --seed=init_job_sources
+npm run db:seed -w @jobs/db -- --seed=init_job_sources
 ```
 
 ### Development

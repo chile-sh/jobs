@@ -1,7 +1,6 @@
 import { publicProcedure, router } from '../trpc'
 import { z } from 'zod'
 import { createJob, getSources } from '@/models/job.model'
-import { toJson } from '@jobs/db'
 
 export const jobRouter = router({
   getSources: publicProcedure.query(getSources),
@@ -88,7 +87,7 @@ export const jobRouter = router({
           area: input.area,
           description: input.description,
           level: input.level,
-          places: input.places ? toJson(input.places) : undefined,
+          places: input.places,
           remote_hybrid: input.remote?.hybrid,
           remote_local: input.remote?.local,
           remote_modality: input.remote?.modality,
@@ -96,14 +95,14 @@ export const jobRouter = router({
           remote_zone: input.remote?.zone,
           title: input.title,
           type: input.type,
-          date: input.date.toDateString(),
+          date: input.date,
           salary_guess: input.salary?.guess,
           salary_currency: input.salary?.currency,
           salary_max: input.salary?.max,
           salary_min: input.salary?.min,
           salary_type: input.salary?.type,
           salary_unit: input.salary?.unit,
-          meta: toJson(input.meta),
+          meta: input.meta,
         },
         {
           company: input.company,
